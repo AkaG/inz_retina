@@ -9,7 +9,7 @@ class Person(models.Model):
 
 
 class Examination(models.Model):
-    date = models.DateField
+    date = models.DateField()
     current_age = models.PositiveSmallIntegerField()
     icd_code = models.CharField(max_length=15)
 

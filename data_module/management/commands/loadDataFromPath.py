@@ -1,5 +1,7 @@
 from django.core.management import BaseCommand
 
+from data_module.data_acquire.path_loader import PathLoader
+
 """
 Command for loading data from disc to database
 """
@@ -15,3 +17,5 @@ class Command(BaseCommand):
 
     def load_data_from_path(self, path):
         print("Loading data from %s" % path)
+        path_loader = PathLoader(path)
+        path_loader.load_data()
