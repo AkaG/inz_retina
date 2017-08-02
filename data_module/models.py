@@ -10,8 +10,9 @@ class Person(models.Model):
 
 class Examination(models.Model):
     date = models.DateField()
-    current_age = models.PositiveSmallIntegerField()
-    icd_code = models.CharField(max_length=15)
+    current_age = models.PositiveSmallIntegerField(blank=True, null=True)
+    icd_code = models.CharField(max_length=15, blank=True, null=True)
+    json = models.TextField(blank=True, null=True)
 
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
 
@@ -21,7 +22,8 @@ class KeyWords(models.Model):
 
 
 class Description(models.Model):
-    text = models.TextField()
+    name = models.TextField()
+    text = models.TextField(blank=True, null=True)
 
     examination = models.ForeignKey(Examination, on_delete=models.CASCADE)
     key_words = models.ManyToManyField(KeyWords)
@@ -36,21 +38,24 @@ class ImageSeries(models.Model):
     )
     eye = models.CharField(
         max_length=1,
-        choices=EYE_CHOICES
+        choices=EYE_CHOICES,
+        blank=True,
+        null=True
     )
-
-    info = models.TextField()
+    name = models.TextField()
+    info = models.TextField(blank=True, null=True)
 
     examination = models.ForeignKey(Examination, on_delete=models.CASCADE)
 
 
 class Image(models.Model):
+    name = models.TextField()
     image = models.ImageField(
         upload_to="images/",
         height_field="height_field",
         width_field="width_field"
     )
-    height_field = models.IntegerField(default=0)
-    width_field = models.IntegerField(default=0)
+    height_field = models.IntegerField(default=0, null=True)
+    width_field = models.IntegerField(default=0, null=True)
 
     image_series = models.ForeignKey(ImageSeries, on_delete=models.CASCADE)
