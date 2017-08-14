@@ -1,58 +1,46 @@
-from reports.utils.report_template import  ReportTemplate
-from reports.models import Report
-from django.core.files import File
+import tempfile
+import json
+
 from django.conf import settings
-import os, io, tempfile
+from django.core.files import File
+from keras.models import model_from_json
+
+from reports.models import Report
+from reports.utils.report_template import ReportTemplate
+
 
 class ReportGenerator():
-    def __init__(self, modelHistory, model):
-        self.directory = 'saved_reports'
+    def __init__(self, path, model, model_history, neural_network):
+        self.directory = path
         self.model = model
-        self.modelHistory = modelHistory
+        self.modelHistory = model_history
+        self.neural_network = neural_network
 
     def generate_report(self):
         self._create_directory()
-        id = self._get_next_report_id()
-        reportFile = self._get_report_file(id)
-        modelFile = self._get_model_file(id)
-        weightsFile = self._get_weights_file(id)
-        report = Report(report = reportFile, model=modelFile, weights=weightsFile)
+        report = Report()
         report.save()
 
-        reportFile.close()
-        modelFile.close()
-        weightsFile.close()
+        report.report = self._get_report_file(report.id)
+        report.neural_network = self.neural_network
+        report.save()
 
-    def _create_directory(self):
-        if not os.path.exists(self.directory):
-            os.makedirs(self.directory)
-
-    def _get_next_report_id(self):
-        if(len(Report.objects.all()) > 0):
-            nextId =  Report.objects.latest('id').id + 1
-        else:
-            nextId = 1
-        return nextId
-
-    def _get_report_file(self, reportId):
-            f = open(self.directory+'/report'+str(reportId)+'.pdf','wb+')
+    def _get_report_file(self, report_id):
+        with open(self.directory + '\\' + str(report_id) + '.pdf', 'wb+') as f:
             file = File(f)
-            reportContent = ReportTemplate(self.model,self.modelHistory,reportId).get_report_content()
-            file.write(reportContent)
+            report_content = ReportTemplate(self.model, self.modelHistory, report_id).get_report_content()
+            file.write(report_content)
             return file
 
-    def _get_model_file(self,id):
-        folderPath = settings.MEDIA_ROOT+'\\models\\'
-        if not os.path.exists(folderPath):
-            os.makedirs(folderPath)
-        file = tempfile.NamedTemporaryFile(mode='w+',dir=folderPath, suffix='_id'+str(id), delete=True)
-        file.write(self.model.to_json())
-        return File(file)
 
-    def _get_weights_file(self,id):
-        folderPath = settings.MEDIA_ROOT+'\\weights\\'
-        if not os.path.exists(folderPath):
-            os.makedirs(folderPath)
-        path = folderPath+'weight'+str(id)
-        self.model.save_weights(path)
-        return File(open(path,mode='rb'))
+class ReportGeneratorManager():
+    def __init__(self, neural_network=None):
+        self.neural_network = neural_network
+
+    def create_report(self, model_history):
+        with tempfile.TemporaryDirectory(dir=settings.MEDIA_ROOT) as tempdir:
+            json_string = json.load(self.neural_network.model)
+            model = model_from_json(json.dumps(json_string))
+
+            report_gen = ReportGenerator(tempdir, model, model_history, self.neural_network)
+            report_gen.generate_report()
