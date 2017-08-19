@@ -5,11 +5,15 @@ from django.db import models
 
 class NeuralNetwork(models.Model):
     model = models.FileField(
-        upload_to="/models"
+        upload_to="models/"
     )
 
     weights = models.FileField(
-        upload_to="/models_weights"
+        upload_to="models_weights/"
     )
 
-    description = models.TextField()
+    description = models.TextField(
+        null=True,
+        blank=True
+    )
+    created = models.DateTimeField(auto_now_add=True)
