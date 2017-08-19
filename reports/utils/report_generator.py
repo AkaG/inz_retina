@@ -1,6 +1,7 @@
 import tempfile
 import json
 
+import os
 from django.conf import settings
 from django.core.files import File
 from keras.models import model_from_json
@@ -26,7 +27,7 @@ class ReportGenerator():
         report.save()
 
     def _get_report_file(self, report_id):
-        with open(self.directory + '\\' + str(report_id) + '.pdf', 'wb+') as f:
+        with open(os.path.join(self.directory, str(report_id) + '.pdf'), 'wb+') as f:
             file = File(f)
             report_content = ReportTemplate(self.model, self.modelHistory, report_id).get_report_content()
             file.write(report_content)

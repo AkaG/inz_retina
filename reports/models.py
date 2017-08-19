@@ -5,7 +5,7 @@ from neural_network.models import NeuralNetwork
 
 class Report(models.Model):
     report = models.FileField(
-        upload_to="/reports",
+        upload_to="reports/",
         blank=True,
         null=True
     )
