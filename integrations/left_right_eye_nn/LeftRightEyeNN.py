@@ -6,6 +6,8 @@ from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 
 from data_module.models import ImageSeries, Image
+from neural_network.nn_manager.FileNNSave import FileNNSave
+from neural_network.nn_manager.DBNNSave import DBNNSave
 from neural_network.nn_manager.TrainManager import TrainManager
 from retina_scan import settings
 
@@ -13,10 +15,10 @@ from retina_scan import settings
 class LeftRightEyeNN(TrainManager):
     input_shape = (100, 100, 3)
 
-    batch_size = 8
-    epochs = 1
-    steps_per_epoch = 32
-    validation_steps = 32
+    batch_size = 4
+    epochs = 2
+    steps_per_epoch = 20
+    validation_steps = 20
 
     dir = os.path.join(settings.MEDIA_ROOT, "left_right_eye")
     train_dir = os.path.join(dir, "train")
@@ -49,10 +51,10 @@ class LeftRightEyeNN(TrainManager):
         model = Sequential()
 
         model.add(Convolution2D(128, (3, 3), activation='relu', input_shape=self.input_shape))
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(Convolution2D(128, (3, 3), activation='relu'))
+        # model.add(MaxPooling2D(pool_size=(2, 2)))
+        # model.add(Convolution2D(128, (3, 3), activation='relu'))
         model.add(Flatten())
-        model.add(Dense(512, activation='relu'))
+        # model.add(Dense(512, activation='relu'))
         model.add(Dense(1, activation='sigmoid'))
 
         model.compile(loss='binary_crossentropy',
@@ -81,6 +83,9 @@ class LeftRightEyeNN(TrainManager):
         return ImageDataGenerator(
             rescale=1. / 255
         )
+
+    def store_method(self):
+        return DBNNSave()
 
     def generate_data(self):
         if len(os.listdir(os.path.join(self.train_dir, self.left_eye_folder))) == 0:
