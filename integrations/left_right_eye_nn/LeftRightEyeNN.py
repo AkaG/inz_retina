@@ -6,8 +6,10 @@ from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 
 from data_module.models import ImageSeries, Image
+from neural_network.models import NeuralNetwork
 from neural_network.nn_manager.FileNNSave import FileNNSave
 from neural_network.nn_manager.DBNNSave import DBNNSave
+from neural_network.nn_manager.ModelLoader import load_model_from_json_file, load_weights_from_file
 from neural_network.nn_manager.TrainManager import TrainManager
 from retina_scan import settings
 
@@ -16,9 +18,9 @@ class LeftRightEyeNN(TrainManager):
     input_shape = (100, 100, 3)
 
     batch_size = 32
-    epochs = 5
+    epochs = 10
     steps_per_epoch = 1500
-    validation_steps = 500
+    validation_steps = 700
 
     dir = os.path.join(settings.MEDIA_ROOT, "left_right_eye")
     train_dir = os.path.join(dir, "train")
@@ -62,6 +64,12 @@ class LeftRightEyeNN(TrainManager):
         model.compile(loss='binary_crossentropy',
                       optimizer='adam',
                       metrics=['accuracy'])
+
+        nn = NeuralNetwork.objects.all().filter(description='left_right_eye')
+        if nn.count() > 0:
+            nn = nn.latest('created')
+            load_weights_from_file(model=model, file_path=nn.weights.path)
+
         return model
 
     def test_data_generator(self):
@@ -87,7 +95,7 @@ class LeftRightEyeNN(TrainManager):
         )
 
     def store_method(self):
-        return DBNNSave()
+        return DBNNSave(description='left_right_eye')
 
     def generate_data(self):
         train_factor = 0.8

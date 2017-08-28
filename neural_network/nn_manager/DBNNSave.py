@@ -9,8 +9,12 @@ from retina_scan import settings
 
 
 class DBNNSave(AbstractNNSave):
-    def __init__(self):
-        self.nn = NeuralNetwork()
+    def __init__(self, nn=None, description=None):
+        if nn is None:
+            self.nn = NeuralNetwork()
+            self.nn.description = description
+        else:
+            self.nn = nn
 
     def save_model(self, model):
         self.nn.model.save("nn_model", ContentFile(model.to_json()))
