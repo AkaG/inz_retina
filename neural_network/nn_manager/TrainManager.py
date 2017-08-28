@@ -1,12 +1,11 @@
-import os
 import tempfile
 from abc import abstractmethod
-from time import sleep
 from typing import List
 
 from keras import callbacks
 
 from neural_network.nn_manager.AbstractNNSave import AbstractNNSave
+from neural_network.nn_manager.callbacks import ModelSave
 from retina_scan import settings
 
 
@@ -22,9 +21,10 @@ class TrainManager(object):
 
     def default_callbacks(self, directory) -> List:
         return [
-            callbacks.ModelCheckpoint(os.path.join(directory, 'weights.{epoch:02d}-{val_loss:.2f}.hdf5'), monitor='val_loss', verbose=0,
-                                      save_best_only=True, save_weights_only=True, mode='auto', period=1),
-            callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=5, verbose=0, mode='auto')
+            # callbacks.ModelCheckpoint(os.path.join(directory, 'weights.{epoch:02d}-{val_loss:.2f}.hdf5'), monitor='val_loss', verbose=0,
+            #                           save_best_only=True, save_weights_only=True, mode='auto', period=1),
+            callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=5, verbose=0, mode='auto'),
+            ModelSave(self.nn_save_class),
         ]
 
     def train_model(self, steps_per_epoch, validation_steps, epochs=5):
