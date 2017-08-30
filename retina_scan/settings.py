@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'integrations',
     'reports',
     'neural_network',
+    'preprocessing'
 ]
 
 MIDDLEWARE = [
