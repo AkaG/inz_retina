@@ -8,3 +8,5 @@ class Command(BaseCommand):
 
     def main(self):
         print("Image preprocessing")
+
+        ImagePreprocessing()
