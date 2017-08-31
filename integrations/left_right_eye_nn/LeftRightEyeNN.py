@@ -1,13 +1,15 @@
 import os
 import shutil
 
-from keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense
+from keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense, BatchNormalization
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 
 from data_module.models import ImageSeries, Image
+from neural_network.models import NeuralNetwork
 from neural_network.nn_manager.FileNNSave import FileNNSave
 from neural_network.nn_manager.DBNNSave import DBNNSave
+from neural_network.nn_manager.ModelLoader import load_model_from_json_file, load_weights_from_file
 from neural_network.nn_manager.TrainManager import TrainManager
 from retina_scan import settings
 
@@ -15,10 +17,10 @@ from retina_scan import settings
 class LeftRightEyeNN(TrainManager):
     input_shape = (100, 100, 3)
 
-    batch_size = 4
-    epochs = 2
-    steps_per_epoch = 20
-    validation_steps = 20
+    batch_size = 32
+    epochs = 10
+    steps_per_epoch = 1500
+    validation_steps = 700
 
     dir = os.path.join(settings.MEDIA_ROOT, "left_right_eye")
     train_dir = os.path.join(dir, "train")
@@ -51,15 +53,23 @@ class LeftRightEyeNN(TrainManager):
         model = Sequential()
 
         model.add(Convolution2D(128, (3, 3), activation='relu', input_shape=self.input_shape))
-        # model.add(MaxPooling2D(pool_size=(2, 2)))
-        # model.add(Convolution2D(128, (3, 3), activation='relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(BatchNormalization())
+        model.add(Convolution2D(128, (3, 3), activation='relu'))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Flatten())
-        # model.add(Dense(512, activation='relu'))
+        model.add(Dense(512, activation='relu'))
         model.add(Dense(1, activation='sigmoid'))
 
         model.compile(loss='binary_crossentropy',
                       optimizer='adam',
                       metrics=['accuracy'])
+
+        nn = NeuralNetwork.objects.all().filter(description='left_right_eye')
+        if nn.count() > 0:
+            nn = nn.latest('created')
+            load_weights_from_file(model=model, file_path=nn.weights.path)
+
         return model
 
     def test_data_generator(self):
@@ -85,17 +95,22 @@ class LeftRightEyeNN(TrainManager):
         )
 
     def store_method(self):
-        return DBNNSave()
+        return DBNNSave(description='left_right_eye')
 
     def generate_data(self):
+        train_factor = 0.8
+
         if len(os.listdir(os.path.join(self.train_dir, self.left_eye_folder))) == 0:
             print("left eye images folder empty - generating data")
             train_left = os.path.join(self.train_dir, self.left_eye_folder)
             test_left = os.path.join(self.test_dir, self.left_eye_folder)
 
             left_img = Image.objects.all().filter(image_series__eye=ImageSeries.LEFT)
-            for img in left_img:
+            img_count = left_img.count()
+
+            for img in left_img[:(img_count*train_factor)]:
                 shutil.copy2(img.image.path, train_left)
+            for img in left_img[(img_count*train_factor):]:
                 shutil.copy2(img.image.path, test_left)
 
         if len(os.listdir(os.path.join(self.train_dir, self.right_eye_folder))) == 0:
@@ -104,8 +119,10 @@ class LeftRightEyeNN(TrainManager):
             test_right = os.path.join(self.test_dir, self.right_eye_folder)
 
             right_img = Image.objects.all().filter(image_series__eye=ImageSeries.RIGHT)
-            for img in right_img:
+            img_count = right_img.count()
+            for img in right_img[:img_count*train_factor]:
                 shutil.copy2(img.image.path, train_right)
+            for img in right_img[img_count*train_factor:]:
                 shutil.copy2(img.image.path, test_right)
 
     def train(self):
