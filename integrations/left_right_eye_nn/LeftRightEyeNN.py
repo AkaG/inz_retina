@@ -5,11 +5,10 @@ from keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense, BatchNorma
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 
-from data_module.models import ImageSeries, Image
+from data_module.models import ImageSeries, Image, Person, Examination
 from neural_network.models import NeuralNetwork
-from neural_network.nn_manager.FileNNSave import FileNNSave
 from neural_network.nn_manager.DBNNSave import DBNNSave
-from neural_network.nn_manager.ModelLoader import load_model_from_json_file, load_weights_from_file
+from neural_network.nn_manager.ModelLoader import load_weights_from_file
 from neural_network.nn_manager.TrainManager import TrainManager
 from retina_scan import settings
 
@@ -24,6 +23,7 @@ class LeftRightEyeNN(TrainManager):
 
     dir = os.path.join(settings.MEDIA_ROOT, "left_right_eye")
     train_dir = os.path.join(dir, "train")
+    validation_dir = os.path.join(dir, "validate")
     test_dir = os.path.join(dir, "test")
 
     left_eye_folder = "left"
@@ -35,27 +35,35 @@ class LeftRightEyeNN(TrainManager):
         self.create_dirs()
 
     def create_dirs(self):
+
         if not os.path.isdir(self.dir):
             os.makedirs(self.dir)
-        if not os.path.isdir(self.train_dir):
-            os.makedirs(self.train_dir)
-        if len(os.listdir(self.train_dir)) == 0:
-            os.makedirs(os.path.join(self.train_dir, self.left_eye_folder))
-            os.makedirs(os.path.join(self.train_dir, self.right_eye_folder))
 
-        if not os.path.isdir(self.test_dir):
-            os.makedirs(self.test_dir)
-        if len(os.listdir(self.test_dir)) == 0:
-            os.makedirs(os.path.join(self.test_dir, self.left_eye_folder))
-            os.makedirs(os.path.join(self.test_dir, self.right_eye_folder))
+        self._create_dir(self.train_dir)
+        self._create_dir(self.validation_dir)
+        self._create_dir(self.test_dir)
+
+    def _create_dir(self, path):
+        if not os.path.isdir(path):
+            os.makedirs(path)
+        if len(os.listdir(path)) == 0:
+            os.makedirs(os.path.join(path, self.left_eye_folder))
+            os.makedirs(os.path.join(path, self.right_eye_folder))
 
     def create_model(self):
         model = Sequential()
 
         model.add(Convolution2D(128, (3, 3), activation='relu', input_shape=self.input_shape))
+        # model.add(BatchNormalization())
+        # model.add(Activation('relu'))
+
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(BatchNormalization())
+
         model.add(Convolution2D(128, (3, 3), activation='relu'))
+        # model.add(BatchNormalization())
+        # model.add(Activation('relu'))
+
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(Flatten())
         model.add(Dense(512, activation='relu'))
@@ -74,7 +82,7 @@ class LeftRightEyeNN(TrainManager):
 
     def test_data_generator(self):
         return self.data_gen().flow_from_directory(
-            self.test_dir,
+            self.validation_dir,
             target_size=(self.input_shape[0], self.input_shape[1]),
             batch_size=self.batch_size,
             class_mode='binary'
@@ -99,31 +107,44 @@ class LeftRightEyeNN(TrainManager):
 
     def generate_data(self):
         train_factor = 0.8
+        validation_factor = 0.15
+
+        patients = Person.objects.all()
+        patient_count = patients.count()
 
         if len(os.listdir(os.path.join(self.train_dir, self.left_eye_folder))) == 0:
-            print("left eye images folder empty - generating data")
+            print("generating train data")
             train_left = os.path.join(self.train_dir, self.left_eye_folder)
-            test_left = os.path.join(self.test_dir, self.left_eye_folder)
-
-            left_img = Image.objects.all().filter(image_series__eye=ImageSeries.LEFT)
-            img_count = left_img.count()
-
-            for img in left_img[:(img_count*train_factor)]:
-                shutil.copy2(img.image.path, train_left)
-            for img in left_img[(img_count*train_factor):]:
-                shutil.copy2(img.image.path, test_left)
-
-        if len(os.listdir(os.path.join(self.train_dir, self.right_eye_folder))) == 0:
-            print("right eye images folder empty - generating data")
             train_right = os.path.join(self.train_dir, self.right_eye_folder)
-            test_right = os.path.join(self.test_dir, self.right_eye_folder)
+            for patient in patients[:(patient_count * train_factor)]:
+                self._generate_data_from_patient(patient, train_left, train_right)
 
-            right_img = Image.objects.all().filter(image_series__eye=ImageSeries.RIGHT)
-            img_count = right_img.count()
-            for img in right_img[:img_count*train_factor]:
-                shutil.copy2(img.image.path, train_right)
-            for img in right_img[img_count*train_factor:]:
-                shutil.copy2(img.image.path, test_right)
+        if len(os.listdir(os.path.join(self.validation_dir, self.left_eye_folder))) == 0:
+            print("generating validation data")
+            validation_left = os.path.join(self.validation_dir, self.left_eye_folder)
+            validation_right = os.path.join(self.validation_dir, self.right_eye_folder)
+            for patient in patients[(patient_count * train_factor):(patient_count * (train_factor + validation_factor))]:
+                self._generate_data_from_patient(patient, validation_left, validation_right)
+
+        if len(os.listdir(os.path.join(self.test_dir, self.left_eye_folder))) == 0:
+            print("generating test data")
+            test_left = os.path.join(self.test_dir, self.left_eye_folder)
+            test_right = os.path.join(self.test_dir, self.right_eye_folder)
+            for patient in patients[(patient_count * (train_factor + validation_factor)):]:
+                self._generate_data_from_patient(patient, test_left, test_right)
+
+    def _generate_data_from_patient(self, patient, img_left_path, img_right_path):
+        exams = Examination.objects.all().filter(person=patient)
+        for exam in exams:
+            for img_serie in ImageSeries.objects.all().filter(examination=exam, eye=ImageSeries.LEFT):
+                self._copy_queryset_images_to_path(Image.objects.all().filter(image_series=img_serie), img_left_path)
+            for img_serie in ImageSeries.objects.all().filter(examination=exam, eye=ImageSeries.RIGHT):
+                self._copy_queryset_images_to_path(Image.objects.all().filter(image_series=img_serie), img_right_path)
+
+    @staticmethod
+    def _copy_queryset_images_to_path(qs, path):
+        for img in qs:
+            shutil.copy2(img.image.path, path)
 
     def train(self):
         self.train_model(
