@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense, BatchNormalization
+from keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense, BatchNormalization, Activation
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 
@@ -17,9 +17,11 @@ class LeftRightEyeNN(TrainManager):
     input_shape = (100, 100, 3)
 
     batch_size = 32
-    epochs = 10
-    steps_per_epoch = 1500
+    epochs = 50
+    steps_per_epoch = 2000
     validation_steps = 700
+
+    db_description = 'left_right_eye'
 
     dir = os.path.join(settings.MEDIA_ROOT, "left_right_eye")
     train_dir = os.path.join(dir, "train")
@@ -53,31 +55,36 @@ class LeftRightEyeNN(TrainManager):
     def create_model(self):
         model = Sequential()
 
-        model.add(Convolution2D(128, (3, 3), activation='relu', input_shape=self.input_shape))
-        # model.add(BatchNormalization())
-        # model.add(Activation('relu'))
+        model.add(Convolution2D(128, (3, 3), input_shape=self.input_shape))
+        model.add(BatchNormalization())
+        model.add(Activation('relu'))
 
         model.add(MaxPooling2D(pool_size=(2, 2)))
         model.add(BatchNormalization())
 
-        model.add(Convolution2D(128, (3, 3), activation='relu'))
-        # model.add(BatchNormalization())
-        # model.add(Activation('relu'))
+        model.add(Convolution2D(128, (3, 3)))
+        model.add(BatchNormalization())
+        model.add(Activation('relu'))
 
-        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(MaxPooling2D(pool_size=(3, 3)))
         model.add(Flatten())
-        model.add(Dense(512, activation='relu'))
+
+        model.add(Dense(128))
+        model.add(BatchNormalization())
+        model.add(Activation('relu'))
+
         model.add(Dense(1, activation='sigmoid'))
 
         model.compile(loss='binary_crossentropy',
                       optimizer='adam',
                       metrics=['accuracy'])
 
-        nn = NeuralNetwork.objects.all().filter(description='left_right_eye')
+        nn = NeuralNetwork.objects.all().filter(description=self.db_description)
         if nn.count() > 0:
             nn = nn.latest('created')
             load_weights_from_file(model=model, file_path=nn.weights.path)
 
+        print(model.summary())
         return model
 
     def test_data_generator(self):
@@ -103,7 +110,7 @@ class LeftRightEyeNN(TrainManager):
         )
 
     def store_method(self):
-        return DBNNSave(description='left_right_eye')
+        return DBNNSave(description=self.db_description)
 
     def generate_data(self):
         train_factor = 0.8
@@ -150,5 +157,6 @@ class LeftRightEyeNN(TrainManager):
         self.train_model(
             self.steps_per_epoch // self.batch_size,
             self.validation_steps // self.batch_size,
-            epochs=self.epochs
+            epochs=self.epochs,
+            save_at_end=False
         )
