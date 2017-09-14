@@ -19,7 +19,7 @@ class LeftRightEyeNN(TrainManager):
     batch_size = 32
     epochs = 50
     steps_per_epoch = 2000
-    validation_steps = 700
+    validation_steps = 450
 
     db_description = 'left_right_eye'
 
@@ -143,9 +143,9 @@ class LeftRightEyeNN(TrainManager):
     def _generate_data_from_patient(self, patient, img_left_path, img_right_path):
         exams = Examination.objects.all().filter(person=patient)
         for exam in exams:
-            for img_serie in ImageSeries.objects.all().filter(examination=exam, eye=ImageSeries.LEFT):
+            for img_serie in ImageSeries.objects.all().filter(examination=exam, eye=ImageSeries.LEFT).exclude(name__icontains='after'):
                 self._copy_queryset_images_to_path(Image.objects.all().filter(image_series=img_serie), img_left_path)
-            for img_serie in ImageSeries.objects.all().filter(examination=exam, eye=ImageSeries.RIGHT):
+            for img_serie in ImageSeries.objects.all().filter(examination=exam, eye=ImageSeries.RIGHT).exclude(name__icontains='after'):
                 self._copy_queryset_images_to_path(Image.objects.all().filter(image_series=img_serie), img_right_path)
 
     @staticmethod

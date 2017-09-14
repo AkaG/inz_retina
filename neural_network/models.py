@@ -16,4 +16,13 @@ class NeuralNetwork(models.Model):
         null=True,
         blank=True
     )
+
+    val_loss = models.FloatField(
+        null=True,
+        blank=True
+    )
+    val_acc = models.FloatField(
+        null=True,
+        blank=True
+    )
     created = models.DateTimeField(auto_now_add=True)
