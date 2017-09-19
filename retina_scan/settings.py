@@ -82,7 +82,7 @@ DATABASES = {
         'NAME': 'retina_scan',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '',
     }
 }
