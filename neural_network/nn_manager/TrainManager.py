@@ -4,8 +4,8 @@ from typing import List
 
 from keras import callbacks
 
-from neural_network.nn_manager.AbstractNNSave import AbstractNNSave
 from neural_network.nn_manager.callbacks import ModelSave
+from neural_network.store.AbstractNNSave import AbstractNNSave
 from retina_scan import settings
 
 

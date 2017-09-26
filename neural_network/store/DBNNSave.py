@@ -4,7 +4,7 @@ import tempfile
 from django.core.files.base import ContentFile, File
 
 from neural_network.models import NeuralNetwork
-from neural_network.nn_manager.AbstractNNSave import AbstractNNSave
+from neural_network.store.AbstractNNSave import AbstractNNSave
 from retina_scan import settings
 
 

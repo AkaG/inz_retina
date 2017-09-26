@@ -7,9 +7,9 @@ from keras.preprocessing.image import ImageDataGenerator
 
 from data_module.models import ImageSeries, Image, Person, Examination
 from neural_network.models import NeuralNetwork
-from neural_network.nn_manager.DBNNSave import DBNNSave
-from neural_network.nn_manager.ModelLoader import load_weights_from_file
 from neural_network.nn_manager.TrainManager import TrainManager
+from neural_network.store.DBNNSave import DBNNSave
+from neural_network.store.ModelLoader import load_weights_from_file
 from retina_scan import settings
 
 
