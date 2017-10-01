@@ -1,6 +1,7 @@
 import os
 import shutil
 
+from PIL import Image as PILImage
 from keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense, BatchNormalization, Activation
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
@@ -18,10 +19,10 @@ class LeftRightEyeNN(TrainManager):
 
     batch_size = 32
     epochs = 50
-    steps_per_epoch = 2000
-    validation_steps = 450
+    steps_per_epoch = 4000
+    validation_steps = 900
 
-    db_description = 'left_right_eye'
+    db_description = 'left_right_eye2'
 
     dir = os.path.join(settings.MEDIA_ROOT, "left_right_eye")
     train_dir = os.path.join(dir, "train")
@@ -113,45 +114,53 @@ class LeftRightEyeNN(TrainManager):
         return DBNNSave(description=self.db_description)
 
     def generate_data(self):
-        train_factor = 0.8
+        train_factor = 0.75
         validation_factor = 0.15
 
+        self._generate_single_set(self.train_dir, start_factor=0, end_factor=train_factor)
+        self._generate_single_set(self.validation_dir, start_factor=train_factor, end_factor=train_factor + validation_factor)
+        self._generate_single_set(self.test_dir, start_factor=train_factor + validation_factor, end_factor=1)
+
+    def _generate_single_set(self, path, start_factor=0, end_factor=1):
         patients = Person.objects.all()
         patient_count = patients.count()
 
-        if len(os.listdir(os.path.join(self.train_dir, self.left_eye_folder))) == 0:
-            print("generating train data")
-            train_left = os.path.join(self.train_dir, self.left_eye_folder)
-            train_right = os.path.join(self.train_dir, self.right_eye_folder)
-            for patient in patients[:(patient_count * train_factor)]:
-                self._generate_data_from_patient(patient, train_left, train_right)
-
-        if len(os.listdir(os.path.join(self.validation_dir, self.left_eye_folder))) == 0:
-            print("generating validation data")
-            validation_left = os.path.join(self.validation_dir, self.left_eye_folder)
-            validation_right = os.path.join(self.validation_dir, self.right_eye_folder)
-            for patient in patients[(patient_count * train_factor):(patient_count * (train_factor + validation_factor))]:
-                self._generate_data_from_patient(patient, validation_left, validation_right)
-
-        if len(os.listdir(os.path.join(self.test_dir, self.left_eye_folder))) == 0:
-            print("generating test data")
-            test_left = os.path.join(self.test_dir, self.left_eye_folder)
-            test_right = os.path.join(self.test_dir, self.right_eye_folder)
-            for patient in patients[(patient_count * (train_factor + validation_factor)):]:
-                self._generate_data_from_patient(patient, test_left, test_right)
+        if len(os.listdir(os.path.join(path, self.left_eye_folder))) == 0:
+            print("generating data into {}".format(path))
+            left_dir = os.path.join(path, self.left_eye_folder)
+            right_dir = os.path.join(path, self.right_eye_folder)
+            for patient in patients[(patient_count * start_factor):(patient_count * end_factor)]:
+                self._generate_data_from_patient(patient, left_dir, right_dir)
 
     def _generate_data_from_patient(self, patient, img_left_path, img_right_path):
         exams = Examination.objects.all().filter(person=patient)
         for exam in exams:
             for img_serie in ImageSeries.objects.all().filter(examination=exam, eye=ImageSeries.LEFT).exclude(name__icontains='after'):
                 self._copy_queryset_images_to_path(Image.objects.all().filter(image_series=img_serie), img_left_path)
+                self._copy_queryset_images_to_path(Image.objects.all().filter(image_series=img_serie), img_right_path,
+                                                   preprocess_func=self._transform_image)
             for img_serie in ImageSeries.objects.all().filter(examination=exam, eye=ImageSeries.RIGHT).exclude(name__icontains='after'):
                 self._copy_queryset_images_to_path(Image.objects.all().filter(image_series=img_serie), img_right_path)
+                self._copy_queryset_images_to_path(Image.objects.all().filter(image_series=img_serie), img_left_path,
+                                                   preprocess_func=self._transform_image)
+
+    def _copy_queryset_images_to_path(self, qs, path, preprocess_func=None):
+        for img in qs:
+            if preprocess_func is None:
+                shutil.copy2(img.image.path, path)
+            else:
+                pilimg = PILImage.open(img.image.path)
+                pilimg = preprocess_func(pilimg)
+                pilimg.save(self._prepare_name(path, img.image.name.split('/')[-1]))
 
     @staticmethod
-    def _copy_queryset_images_to_path(qs, path):
-        for img in qs:
-            shutil.copy2(img.image.path, path)
+    def _prepare_name(path, img_name, extension='_1'):
+        img_name = img_name.split('.')
+        return os.path.join(path, '{}{}.{}'.format(img_name[0], extension, img_name[1]))
+
+    @staticmethod
+    def _transform_image(img):
+        return img.transpose(PILImage.FLIP_LEFT_RIGHT)
 
     def train(self):
         self.train_model(
