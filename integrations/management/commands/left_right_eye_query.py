@@ -24,4 +24,4 @@ class Command(BaseCommand):
         for fname in os.listdir(path):
             if fname.endswith('.jpg'):
                 print('append ' + fname)
-                yield Image.open(os.path.join(path, fname))
+                yield fname, Image.open(os.path.join(path, fname))
