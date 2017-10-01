@@ -15,16 +15,18 @@ class LeftRightEyeQuery(GeneratorNNQueryManager):
         norm = self._normalize(np.asarray(ret))
         if len(norm.shape) is 2:
             return np.array([[[x, x, x] for x in y] for y in norm])
+        else:
+            return np.array(norm)
 
     def _normalize(self, img):
-        arr = img.astype('float')
+        arr = img.astype('float32')
 
-        minval = np.amin(arr)
-        maxval = np.amax(arr)
-        arr -= minval
-        arr /= (maxval - minval)
+        # minval = np.amin(arr)
+        # maxval = np.amax(arr)
+        # arr -= minval
+        # arr /= (maxval - minval)
 
-        return arr
+        return arr * (1. / 255)
 
     def create_model(self) -> Model:
         nn = LeftRightEyeNN()
