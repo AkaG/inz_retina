@@ -4,10 +4,14 @@ from preprocessing.image_preprocessing.ImagePreprocessing import ImagePreprocess
 
 
 class Command(BaseCommand):
-    def handle(self, *args, **options):
-        self.main()
+    def add_arguments(self, parser):
+        parser.add_argument('width', default=0, type=int, nargs='?')
+        parser.add_argument('height', default=0, type=int, nargs='?')
 
-    def main(self):
+    def handle(self, *args, **options):
+        self.main(options)
+
+    def main(self, options):
         print("Image preprocessing")
 
-        ImagePreprocessing()
+        ImagePreprocessing(options['width'], options['height'])

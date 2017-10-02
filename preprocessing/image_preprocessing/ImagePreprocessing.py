@@ -1,30 +1,38 @@
 import os
 
-from data_module.models import ImageSeries, Image
+from pylab import *
+from data_module.models import Image
 from django.db.models import Max
 from retina_scan import settings
 
 import numpy as np
 from skimage import data
+from skimage.transform import resize
 
 
 class ImagePreprocessing():
     dir = os.path.join(settings.MEDIA_ROOT, "preprocessed")
 
-    def __init__(self):
+    def __init__(self, width, height):
         self.create_dir()
 
         images = Image.objects.all()
-        max_width, max_height = images.aggregate(Max('width_field'), Max('height_field'))
 
-        print(max_width)
-        print(max_height)
+        query = images.aggregate(max_width=Max('width_field'), max_height=Max('height_field'))
+        max_width = query['max_width']
+        max_height = query['max_height']
+
+        if width and height:
+            max_width = width
+            max_height = height
 
         for imageObject in images:
+            new_image_path = os.path.join(self.dir, imageObject.image.url.replace("images/", ""))
             image_path = os.path.join(settings.MEDIA_ROOT, imageObject.image.url)
             image = data.imread(image_path).astype(np.float64)
 
-            self.preprocess_image(image)
+            image = self.preprocess_image(image, max_width, max_height)
+            imsave(new_image_path, image)
 
     def create_dir(self):
         if not os.path.isdir(self.dir):
@@ -47,17 +55,15 @@ class ImagePreprocessing():
 
         return image
 
-    def standardization(image):
+    def standardization(self, image):
         return (image - np.mean(image)) / np.std(image)
 
-    def preprocess_image(self, image):
-        # image = image[:, :, channel]
-        # image = resize(image, (output_width, output_height))
-        # image = to_float(image)
-        # image = standardization(image)
-
+    def preprocess_image(self, image, output_width, output_height):
         # Check if RGB image
         if len(image.shape) == 3:
             image = self.rgb2gray(image)
 
         image = self.standardization(image)
+        image = resize(image, (output_width, output_height))
+
+        return image
