@@ -7,10 +7,10 @@ import datetime, io, sys
 
 
 class ReportTemplate():
-    def __init__(self, model, modelHistory, reportId):
+    def __init__(self, model, model_history, report_id):
         self.model = model
-        self.modelHistory = modelHistory
-        self.reportId = reportId
+        self.modelHistory = model_history
+        self.reportId = report_id
         self.lineTemplate = "<font fontName='Helvetica-Bold'> %s </font> %s"
         self.story = []
 
