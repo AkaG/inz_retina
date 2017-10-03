@@ -31,3 +31,13 @@ class LeftRightEyeQuery(GeneratorNNQueryManager):
     def create_model(self) -> Model:
         nn = LeftRightEyeNN()
         return nn.model
+
+
+class LeftRightEyeQuerySingleton(object):
+    query = None
+
+    @classmethod
+    def get_instance(cls, *args, **kwargs):
+        if cls.query is None:
+            cls.query = LeftRightEyeQuery()
+        return cls.query
