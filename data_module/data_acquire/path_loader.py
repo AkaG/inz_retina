@@ -46,7 +46,7 @@ class PathLoader():
     def _add_exam_to_patient(self, patient, path, exam_date):
         date = datetime.strptime(exam_date, "%Y-%m-%d").date()
         try:
-            exam = Examination.objects.get(date=date)
+            exam = Examination.objects.get(date=date, person=patient)
         except Exception:
             self.logger.info("Create examination for patient {} with date {}".format(patient.code_name, exam_date))
             exam = Examination(date=date, person=patient)

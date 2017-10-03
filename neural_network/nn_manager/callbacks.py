@@ -23,4 +23,4 @@ class ModelSave(Callback):
         else:
             if self.monitor_op(current, self.best):
                 self.best = current
-                self.nn_save_class.save(self.model)
+                self.nn_save_class.save(self.model, val_loss=logs.get('val_loss'), val_acc=logs.get('val_acc'))

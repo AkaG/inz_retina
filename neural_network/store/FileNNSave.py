@@ -1,6 +1,6 @@
 import os
 
-from neural_network.nn_manager.AbstractNNSave import AbstractNNSave
+from neural_network.store.AbstractNNSave import AbstractNNSave
 
 
 class FileNNSave(AbstractNNSave):

@@ -4,7 +4,7 @@ import tempfile
 from django.core.files.base import ContentFile, File
 
 from neural_network.models import NeuralNetwork
-from neural_network.nn_manager.AbstractNNSave import AbstractNNSave
+from neural_network.store.AbstractNNSave import AbstractNNSave
 from retina_scan import settings
 
 
@@ -26,3 +26,9 @@ class DBNNSave(AbstractNNSave):
             with open(file_path, "rb") as weights:
                 self.nn.weights.save("nn_weights.h5", File(weights))
 
+        if 'val_loss' in self.kwargs:
+            self.nn.val_loss = self.kwargs['val_loss']
+        if 'val_acc' in self.kwargs:
+            self.nn.val_acc = self.kwargs['val_acc']
+
+        self.nn.save()
