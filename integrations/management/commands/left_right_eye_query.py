@@ -17,6 +17,8 @@ class Command(BaseCommand):
         print('Query Left Right Eye NN')
 
         nn = LeftRightEyeQuery()
-        datagen = DataGenerator()
+        datagen = DataGenerator(img_shape=nn.nn.input_shape)
         path = os.path.join(settings.MEDIA_ROOT, os.path.join('left_right_eye', os.path.join('test', 'left')))
         res = nn.model_predict(datagen.flow_from_directory(path))
+        print(res)
+

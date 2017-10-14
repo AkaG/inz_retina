@@ -15,14 +15,14 @@ from retina_scan import settings
 
 
 class LeftRightEyeNN(TrainManager):
-    input_shape = (100, 100, 3)
+    input_shape = (100, 100, 1)
 
     batch_size = 32
     epochs = 50
     steps_per_epoch = 4000
     validation_steps = 900
 
-    db_description = 'left_right_eye2'
+    db_description = 'left_right_eye3'
 
     dir = os.path.join(settings.MEDIA_ROOT, "left_right_eye")
     train_dir = os.path.join(dir, "train")
@@ -93,7 +93,8 @@ class LeftRightEyeNN(TrainManager):
             self.validation_dir,
             target_size=(self.input_shape[0], self.input_shape[1]),
             batch_size=self.batch_size,
-            class_mode='binary'
+            class_mode='binary',
+            color_mode='grayscale'
         )
 
     def train_data_generator(self):
@@ -101,7 +102,8 @@ class LeftRightEyeNN(TrainManager):
             self.train_dir,
             target_size=(self.input_shape[0], self.input_shape[1]),
             batch_size=self.batch_size,
-            class_mode='binary'
+            class_mode='binary',
+            color_mode='grayscale'
         )
 
     @staticmethod

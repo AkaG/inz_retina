@@ -1,4 +1,3 @@
-import numpy as np
 from keras.models import Model
 
 from integrations.left_right_eye_nn.LeftRightEyeNN import LeftRightEyeNN
@@ -11,22 +10,9 @@ class LeftRightEyeQuery(GeneratorNNQueryManager):
         super().__init__()
 
     def transform_image(self, image):
-        ret = image.resize((self.nn.input_shape[0], self.nn.input_shape[1]))
-        norm = self._normalize(np.asarray(ret))
-        if len(norm.shape) is 2:
-            return np.array([[[x, x, x] for x in y] for y in norm])
-        else:
-            return np.array(norm)
-
-    def _normalize(self, img):
-        arr = img.astype('float32')
-
-        # minval = np.amin(arr)
-        # maxval = np.amax(arr)
-        # arr -= minval
-        # arr /= (maxval - minval)
-
-        return arr * (1. / 255)
+        if len(image.shape) == 2:
+            image = image.reshape((image.shape[0], image.shape[1], 1))
+        return image
 
     def create_model(self) -> Model:
         nn = LeftRightEyeNN()
