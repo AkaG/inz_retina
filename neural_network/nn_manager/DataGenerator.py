@@ -23,7 +23,7 @@ class DataGenerator(AbstractDataGenerator):
 
     def preprocess_image(self, image):
         if type(image) is not PIL.JpegImagePlugin.JpegImageFile:
-            image = Image.open(image)
+            image = Image.fromarray(image)
         image = image.convert('L').resize((self.input_shape[0], self.input_shape[1]))
         image = self._normalize(np.asarray(image, dtype=np.float32))
         return image
