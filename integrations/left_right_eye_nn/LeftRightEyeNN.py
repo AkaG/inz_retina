@@ -1,8 +1,9 @@
 import os
 import shutil
 
+import numpy as np
 from PIL import Image as PILImage
-from keras.layers import Convolution2D, MaxPooling2D, Flatten, Dense, BatchNormalization, Activation
+from keras.layers import Convolution2D, Flatten, Dense, BatchNormalization, Activation
 from keras.models import Sequential
 from keras.preprocessing.image import ImageDataGenerator
 
@@ -14,11 +15,20 @@ from neural_network.store.ModelLoader import load_weights_from_file
 from retina_scan import settings
 
 
+def normalize(image):
+    img = np.copy(image)
+    min = np.amin(img)
+    max = np.amax(img)
+    img -= min
+    img /= max - min
+    return img
+
+
 class LeftRightEyeNN(TrainManager):
-    input_shape = (100, 100, 3)
+    input_shape = (100, 100, 1)
 
     batch_size = 32
-    epochs = 50
+    epochs = 100
     steps_per_epoch = 4000
     validation_steps = 900
 
@@ -56,19 +66,15 @@ class LeftRightEyeNN(TrainManager):
     def create_model(self):
         model = Sequential()
 
-        model.add(Convolution2D(128, (3, 3), input_shape=self.input_shape))
+        model.add(Flatten(input_shape=self.input_shape))
+
+        model.add(Dense(512))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
 
-        model.add(MaxPooling2D(pool_size=(2, 2)))
-        model.add(BatchNormalization())
-
-        model.add(Convolution2D(128, (3, 3)))
+        model.add(Dense(256))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
-
-        model.add(MaxPooling2D(pool_size=(3, 3)))
-        model.add(Flatten())
 
         model.add(Dense(128))
         model.add(BatchNormalization())
@@ -83,7 +89,7 @@ class LeftRightEyeNN(TrainManager):
         nn = NeuralNetwork.objects.all().filter(description=self.db_description)
         if nn.count() > 0:
             nn = nn.latest('created')
-            load_weights_from_file(model=model, file_path=nn.weights.path)
+            model = load_weights_from_file(model=model, file_path=nn.weights.path)
 
         print(model.summary())
         return model
@@ -93,7 +99,8 @@ class LeftRightEyeNN(TrainManager):
             self.validation_dir,
             target_size=(self.input_shape[0], self.input_shape[1]),
             batch_size=self.batch_size,
-            class_mode='binary'
+            class_mode='binary',
+            color_mode='grayscale'
         )
 
     def train_data_generator(self):
@@ -101,13 +108,14 @@ class LeftRightEyeNN(TrainManager):
             self.train_dir,
             target_size=(self.input_shape[0], self.input_shape[1]),
             batch_size=self.batch_size,
-            class_mode='binary'
+            class_mode='binary',
+            color_mode='grayscale'
         )
 
     @staticmethod
     def data_gen():
         return ImageDataGenerator(
-            rescale=1. / 255
+            preprocessing_function=normalize
         )
 
     def store_method(self):
