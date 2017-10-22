@@ -26,7 +26,19 @@ class LeftRightEyeQuery(GeneratorNNQueryManager):
         gen, gen_copy = itertools.tee(image_gen)
         org = super().model_predict(gen, batch=batch)
         flipped = super().model_predict(self._override_generator(gen_copy), batch=batch)
-        return self._combine_results(org, flipped)
+        # return self._to_category(self._combine_results(org, flipped))
+        return self._to_category(org)
+
+    def _to_category(self, result_dict):
+        for x in result_dict:
+            if result_dict[x] < 0.45:
+                result_dict[x] = 'L'
+            elif result_dict[x] > 0.55:
+                result_dict[x] = 'R'
+            else:
+                result_dict[x] = 'N'
+
+        return result_dict
 
     def _combine_results(self, org, flipped):
         to_return = {}
@@ -35,7 +47,6 @@ class LeftRightEyeQuery(GeneratorNNQueryManager):
             flipped_result = flipped[name]
             to_return[name] = np.mean([result, 1 - flipped_result])
         return to_return
-
 
     def _override_generator(self, gen):
         try:
