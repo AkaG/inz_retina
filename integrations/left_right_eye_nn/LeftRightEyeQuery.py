@@ -26,8 +26,7 @@ class LeftRightEyeQuery(GeneratorNNQueryManager):
         gen, gen_copy = itertools.tee(image_gen)
         org = super().model_predict(gen, batch=batch)
         flipped = super().model_predict(self._override_generator(gen_copy), batch=batch)
-        # return self._to_category(self._combine_results(org, flipped))
-        return self._to_category(org)
+        return self._to_category(self._combine_results(org, flipped))
 
     def _to_category(self, result_dict):
         for x in result_dict:

@@ -32,7 +32,7 @@ class LeftRightEyeNN(TrainManager):
     steps_per_epoch = 4000
     validation_steps = 900
 
-    db_description = 'left_right_eye'
+    db_description = 'left_right_eye2'
 
     dir = os.path.join(settings.MEDIA_ROOT, "left_right_eye")
     train_dir = os.path.join(dir, "train")
@@ -68,7 +68,15 @@ class LeftRightEyeNN(TrainManager):
 
         model.add(Flatten(input_shape=self.input_shape))
 
+        model.add(Dense(512))
+        model.add(BatchNormalization())
+        model.add(Activation('relu'))
+
         model.add(Dense(256))
+        model.add(BatchNormalization())
+        model.add(Activation('relu'))
+
+        model.add(Dense(128))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
 
