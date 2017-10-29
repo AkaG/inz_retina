@@ -20,6 +20,7 @@ class Command(BaseCommand):
         datagen = DataGenerator(img_shape=nn.nn.input_shape)
         path = os.path.join(settings.MEDIA_ROOT, os.path.join('left_right_eye', os.path.join('test', 'left')))
         res = nn.model_predict(datagen.flow_from_directory(path))
+        res = {k: v['prediction'] for k, v in res.items()}
         print(path)
         print('count: {}, left: {}, right: {}, nn: {}'.format(len(res), list(res.values()).count('L'), list(res.values()).count('R'), list(res.values()).count('N')))
 
