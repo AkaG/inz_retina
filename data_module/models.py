@@ -48,6 +48,17 @@ class ImageSeries(models.Model):
     examination = models.ForeignKey(Examination, on_delete=models.CASCADE)
 
 
+class ProcessedDescription(models.Model):
+    eye = models.CharField(
+        max_length=1,
+        choices=ImageSeries.EYE_CHOICES,
+        blank=True,
+        null=True
+    )
+    text = models.TextField()
+    examination = models.ForeignKey(Examination, on_delete=models.CASCADE, blank=True, null=True)
+
+
 class Image(models.Model):
     name = models.TextField()
     image = models.ImageField(
