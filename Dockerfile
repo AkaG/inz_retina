@@ -30,7 +30,7 @@ VOLUME ["/app", "/media_root"]
 # Expose default django port
 EXPOSE 8000
 
-COPY entrypoint.sh /entrypoint.sh
+COPY scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

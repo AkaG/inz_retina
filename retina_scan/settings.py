@@ -24,7 +24,9 @@ SECRET_KEY = 'x(r+8%@h#$cz6ub58$wws3056_zh=h81cc-q(%jz@an*bh23&i'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'apacs.cs.put.poznan.pl'
+]
 
 # Application definition
 

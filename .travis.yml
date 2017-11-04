@@ -1,0 +1,14 @@
+sudo: required
+language: python
+services:
+- docker
+deploy:
+- provider: script
+  skip_cleanup: true
+  script: chmod 600 deploy_key && ssh -o StrictHostKeyChecking=no -i ./deploy_key
+    app@apacs.cs.put.poznan.pl './deploy.sh'
+  on:
+    branch: master
+before_install:
+- openssl aes-256-cbc -K $encrypted_9e093f3d861b_key -iv $encrypted_9e093f3d861b_iv
+  -in deploy_key.enc -out .\\deploy_key -d
