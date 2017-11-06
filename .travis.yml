@@ -1,14 +1,29 @@
 sudo: required
 language: python
+python:
+  - 3.5
+
+env:
+  global:
+  - secure: MHrOlJS9/JAFvhvi9MWJAFRyCK4mb3j9Y5pTm/fng3fj+XqIXeNAm9qjRBzuHL1oel+pmopiDleLqNde7+7Hbp1tMxyNPk4L6Edf/yQPx1K1lxq0gZ9PONYuH6evRW/liMvxeBNWo6QmqAvLhaihLZwFhLVquifOdl0PdAgF4axPawU+0usgCMFnaeLJiDi2lQKACmCG9ub0bHsOp8GztMPKN9i/lj2Al3m9oeC4pCMZZkwcl1UjqkbNQGa9R4H1EEhcNrALD4y2XfPja3zIs4ih/+6b1BMFyGM7AJUvx2O7aDZizwNFedCxBGwdf7ifBmLgPEyh+ZpmxsLBj79Dx4zarVuybl62XlYqDE/LooL9wVaM1FJTLBxKu8rngZUDeNibmMX+Su7nRazI+FWykp2wZ9VjKnTHm/5ChgFZ5wNU5iKBRanhwkGzgtuA/IaNmJHB5UsJ2YxMSmL39v/m99yrASeIqcN0jcBRKR1Oha778Ks2gOQqbQEgwHHpgrUrU5jKiMdcjnAcj9Ikr0ADqul18cJaKGoymHa96khHbTGUqCMWOASN5VPGOEk3CC2cnF4IvDD9qnZ+Gzxoz1XuJ62r7z/3LVyqV2Yh9ApFF8dVjyEAD6NRAYP+8aJJp0Gobl1PlRaepvmUq77ggv6rDTGgFdCSmbf/1+4irmOsIIw=
+  - secure: n9GQDVWdLXeVU9gy8G3eTaNwi+6W381IGaQDH7342SqqgOhwMkxX4e+3cYiRy2qf4MN/AjGSNOXQRUTiRtUFkDKgzRFfOGQ+zAf3W0+qVBCJZQrBo83u0px3BjdHkCJBxIlv0UtJs+xjobqbvD6LpoZOZGbHl87teuWCuLO46ffUZNpc6tNApDbflE3dhxYVwdwxE1kTZj38zbPs39cpOF5uIq90sa1X82T/HPlFLejQ+n9822hlcjxK9uxg55UcbY/4MeOa64aDKMDedcpHDzENzL4oRuIl3BcTSkptVwndURYcEoMLWn56SDoUTM9y7odft/iD5JXvM1KxgKKd3cY3scs8igq5VVD2QLfjD7I2NbbMYRPf1xIJwHCHZHkT3mePhnaSFFgFeWqZaznytoNq876SkUcDnE9oJ65wdKvkOuOJ23gRq/uc+GYLs6PUlK6PNconJEWcqaZXSyfJhFxFj7UzIvQXgeqQxw/fITTJlksD9VomYQJanSLuiQEz0rpVskaV8s+18LfGZllzAI/wVoSlP6LGxav3cFKJPd5mXmbGt42rr4SlwO0WlQg5iSC6GVjKhWCIRPRucmIe5mCWATOUDY4x9cYdyZC5r24mCdEhUVRx8p509wlayTkoLEptNRB9MFEdlBhQug2PfoHy5SBuuVOl1vkORS+ZXd4=
+  - secure: jJdBWUFirsRMWzxfC0/cVHz5lxARmcINyLtCNAoHInl30mfOs1t4sRK4hW6SFbwOTAgH4BwR4m4dE/+yXdEXkn5pX0cplU61r3V6vh1ZXWf7ZQ3iM7bHGVuigVxf4TBnnNqrGZuynd4GcJBKjWTIEdHafX9kzCVYiKTV61Isttm9Ebd+YYUMup6fZPDsaR63PQ/2ySKzMkZkg05MqCDhOJQKxwKnFseR5J48sSFblBJ2dXyOxmR+1Tw+gBEwTYHnHQcSYbzNzB7VBDY4rUY+tOZbPI46relSZN9ifKRS7Hyyb0vZRqr2ydtMN7CBcc5iTvLxWg3nWfvX+Gf787/L8Zb+qdnFSwNlvEjlQ6MMUGUwzFsqRMz2lB2XCkxc7Imo5ei7gAClVMKfQcs0kRGhRafLrXfsoaWaEjPpj8yRhfyJyuUYuP9AS1SAvXqg3OBOv2APQlzaafBfmfwaWm9dR9IDr3iVdRU44GZDwqqkpQUOPecx1I0x/Z4s1UX/du5WhX1brIzC0XxGgiioWj41v0jUA3xMGz+/iIHK8/WwjuKJeq5tM5hEiNnhfRZ+QrgyKUgjnGTh9VwYTH5rHvGd88hh6KzF1QXHlshKuYiH+u4JWN2se75EFV5J5eWIPrIwFWaye/4iH4uPyQaYTwZ1X/Kdjx8wZZ25SFN15V+310s=
+  - secure: Y8Sk8qgA6++KaTmuX8v0dgVw+AxrqZ8vQbXzystM+tDHDRg4BDNqEX84YDVakgDw3wMyQZ/cyrziCMRXZrXUIa5aZMPzEqUnkck0Lbxpa/2VWxyExJ40z6T+P6zCyl26BB5mw0pxz4kEkv27s0jykTL93/ifoUYUVpNmpRcmcrI/XI/LYvZBJYyObaQKfwu737Ax4nHuskPkA8AyrkEF/TNpARWv4kDtZXV33Ol9Kk6jfJrh54xsy1f0+GEmAAGziZs3U1slDFGanP8CKxivOwQjz3cbUBxH7ZC6t1Yu6midIl0jCMqMN4ellty4rxExpEc2p/i9ucTv+kq2AEYooGwa7DHtSV0EO2bLbUjB/d6ZAcIk4MYWZ/tuE9wh1jG8WddsbSIikTzSN1SCJ8GJPG0T8XT4w2haTnf0ka/pKbd7M86kRzh8GMeds2k5yJY49lyiGYQvFIea7xjD0vHFQyMfb1a9+s/My+rxyg5Ej6hM2UmPbs5vRdjEgyr1FHHoJcIlxbB1YNMOtfhbQM+uNXUH+QIgwGHhIb4BR+zjmvmyYtkVRJXigeB1gZ9KhwN+z3ZRZ95fYdkr6bR5TJ/TvoWgMEW83mWx9oNUrI30Lk87Nm6ocZHZ/oyoXZ7Lawq3MGlyknhTpeQ4ZthLQmiFRCj6JTllMqDQyG3wXolHCU8=
 services:
-- docker
-deploy:
-- provider: script
-  skip_cleanup: true
-  script: chmod 600 deploy_key && ssh -o StrictHostKeyChecking=no -i ./deploy_key
-    app@apacs.cs.put.poznan.pl './deploy.sh'
-  on:
-    branch: master
+  - docker
 before_install:
-- openssl aes-256-cbc -K $encrypted_4f17029c19fe_key -iv $encrypted_4f17029c19fe_iv
-  -in deploy_key.enc -out deploy_key -d
+  - openssl aes-256-cbc -K $encrypted_4f17029c19fe_key -iv $encrypted_4f17029c19fe_iv
+    -in deploy_key.enc -out deploy_key -d
+  - docker-compose build
+  - docker ps -a
+script:
+  - echo 'Test script'
+after_success:
+  - bash scripts/travis_deploy.sh
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: chmod 600 deploy_key && ssh -o StrictHostKeyChecking=no -i ./deploy_key
+      $SERVER_USER@$SERVER_ADDRESS './deploy.sh'
+    on:
+      branch: master

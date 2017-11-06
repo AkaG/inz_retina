@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd ..
-docker-compose down
-docker-compose build
-docker-compose up -d
+cd inz_retina
+sudo docker-compose down
+sudo docker-compose build
+sudo docker-compose up -d
