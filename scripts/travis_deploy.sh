@@ -2,6 +2,10 @@
 
 set -x
 if [ $TRAVIS_BRANCH == 'master' ] ; then
+    eval "$(ssh-agent -s)"
+    chmod 600 ./deploy_key
+    ssh-add ./deploy_key
+
     git init
 
     git remote add deploy "$SERVER_USER@$SERVER_ADDRESS:$GIT_PATH"
