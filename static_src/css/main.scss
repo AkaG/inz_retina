@@ -1,1 +1,8 @@
 @import "reset";
+
+@import '../../node_modules/bootstrap/scss/bootstrap';
+
+body {
+  background-color: #dde2e6;
+  padding-top: 5rem;
+}
