@@ -57,8 +57,8 @@ class SequenceDetectionQuery():
         #tau, p_value = kendalltau(order_original, order_predicted)
         return order_predicted
 
-    def predict(self):
-        series = ImageSeries.objects.all()[0]
+    def predict(self,_id):
+        series = ImageSeries.objects.get(id=_id)
         pairs, results_struct = self.create_sequence_pairs(series)
         for pair in pairs:
             self.predict_pair(pair,results_struct,self.nn)

@@ -8,6 +8,6 @@ class SequencePredictionViewSet(generics.GenericAPIView):
         self.query = SequenceDetectionNNSingleton.get_instance()
 
     def post(self, request, *args, **kwargs):
-        order, result = self.query.predict()
+        order, result = self.query.predict(request.data['id'])
         content = {'order': order, 'details': result}
         return Response(content)

@@ -24,6 +24,7 @@ RUN pip install --no-cache-dir keras
 
 # Install other packages
 RUN pip install --no-cache-dir h5py
+RUN pip install --no-cache-dir scikit-image
 
 # Root, media_root app folder 
 VOLUME ["/app", "/media_root"]
