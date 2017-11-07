@@ -1,0 +1,27 @@
+{% extends 'page.html' %}
+
+{% load static widget_tweaks %}
+
+{% block content %}
+    <div id="view-{{ request.resolver_match.view_name }}" class="container">
+        <div class="text-center mb-4">
+            <h1 class="display-3 mb-3">Left-Right Eye</h1>
+        </div>
+        <div class="bg-light p-4 rounded text-dark">
+            <form class="left-right-eye-form" method="post" action="">
+                {% csrf_token %}
+
+                <label class="sr-only" for="username-input-group">
+                    Image
+                </label>
+                <div class="input-group mb-3 fade-in">
+                    <input type="file" name="">
+                </div>
+
+                <button class="btn btn-primary w-100 fade-in" type="submit">
+                    Submit
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
