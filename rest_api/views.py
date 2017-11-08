@@ -1,4 +1,5 @@
 from PIL import Image
+from braces.views import CsrfExemptMixin
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -10,10 +11,11 @@ from .models import FileUpload
 from .serializers import FileUploadSerializer
 
 
-class FileUploadActionsViewSet(generics.GenericAPIView):
+class FileUploadActionsViewSet(generics.GenericAPIView, CsrfExemptMixin):
     queryset = FileUpload.objects.all()
     serializer_class = FileUploadSerializer
     permission_classes = (AllowAny,)
+    authentication_classes = []
 
     def __init__(self):
         self.query = LeftRightEyeQuerySingleton.get_instance()
