@@ -26,9 +26,5 @@ before_script:
 script:
   - echo 'Test script'
 
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script: sh ./scripts/travis_deploy.sh
-    on:
-      branch: master
+after_success:
+  - bash scripts/travis_deploy.sh
