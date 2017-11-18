@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.humanize',
     'django_extensions',
     'django_cleanup',
     'rest_framework',
@@ -131,3 +130,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media_root')
+
+NOTEBOOK_ARGUMENTS = [
+    '--notebook-dir', 'notebooks',
+]
