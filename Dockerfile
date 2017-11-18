@@ -6,25 +6,8 @@ WORKDIR /app
 # Copy application to container
 COPY . .
 
-# Install django
-RUN pip install --no-cache-dir django \
-            djangorestframework \
-            django-extensions \
-            django-cleanup \
-            Pillow
-
-# Install postgresql driver
-RUN pip install --no-cache-dir psycopg2
-
-# Install Tensorflow CPU
-RUN pip install --no-cache-dir tensorflow
-
-# Install Keras
-RUN pip install --no-cache-dir keras
-
-# Install other packages
-RUN pip install --no-cache-dir h5py
-RUN pip install --no-cache-dir scikit-image
+# Install packages
+RUN pip install -r requirements.txt
 
 # Root, media_root app folder 
 VOLUME ["/app", "/media_root"]
