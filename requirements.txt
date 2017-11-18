@@ -76,3 +76,4 @@ Werkzeug==0.12.2
 widgetsnbextension==3.0.6
 win-unicode-console==0.5
 wrapt==1.10.11
+django-multiupload==0.5.2

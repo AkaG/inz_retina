@@ -7,6 +7,6 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     url(r'left-right-eye', views.FileUploadActionsViewSet.as_view()),
-    url(r'sequence-detecion', views.SequencePredictionViewSet.as_view()),
+    url(r'sequence-detection', views.UploadView.as_view()),
     url(r'^', include(router.urls)),
 ]
