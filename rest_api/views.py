@@ -3,12 +3,14 @@ from braces.views import CsrfExemptMixin
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from django.views.generic.edit import FormView
 
 from integrations.left_right_eye_nn.LeftRightEyeQuery import LeftRightEyeQuerySingleton
 from integrations.sequence_detection_nn.SequenceDetectionQuery import SequenceDetectionNNSingleton
 from neural_network.nn_manager.DataGenerator import DataGenerator
 from .models import FileUpload
 from .serializers import FileUploadSerializer
+from .forms import UploadForm
 
 
 class FileUploadActionsViewSet(generics.GenericAPIView, CsrfExemptMixin):
@@ -27,11 +29,13 @@ class FileUploadActionsViewSet(generics.GenericAPIView, CsrfExemptMixin):
         return Response(pred)
 
 
-class SequencePredictionViewSet(generics.GenericAPIView):
+class UploadView(FormView):
+    template_name = 'sequencedetection.html'
+    form_class = UploadForm
+
     def __init__(self):
         self.query = SequenceDetectionNNSingleton.get_instance()
 
-    def post(self, request, *args, **kwargs):
-        order, result = self.query.predict()
-        content = {'order': order, 'details': result}
-        return Response(content)
+    def form_valid(self, form):
+        order, result_struct = self.query.predict(form.cleaned_data['attachments'])
+        return self.render_to_response(self.get_context_data(order = order, result_struct = result_struct))
