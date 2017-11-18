@@ -1,12 +1,13 @@
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    {% load humanize %}
     {{ form.as_p }}
     <input type="submit" value="Send" />
 
     <br>
     <br>
     {% for key, value in result_struct.items %}
-        {{key}}: {{value}}
+        {{key}}: {{value | floatformat:2}}
     <br>
     {% endfor %}
     <br>
