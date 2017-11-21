@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 from PIL import Image
 from keras.models import Model
-
+from keras import backend
 from integrations.left_right_eye_nn.LeftRightEyeNN import LeftRightEyeNN
 from neural_network.nn_manager.GeneratorNNQueryManager import GeneratorNNQueryManager
 
@@ -68,6 +68,6 @@ class LeftRightEyeQuerySingleton(object):
 
     @classmethod
     def get_instance(cls, *args, **kwargs):
-        if cls.query is None:
-            cls.query = LeftRightEyeQuery()
+        backend.clear_session()
+        cls.query = LeftRightEyeQuery()
         return cls.query
