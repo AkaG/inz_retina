@@ -6,7 +6,7 @@
 {% block content %}
     <div id="view-{{ request.resolver_match.view_name }}" class="container">
         <div class="bg-light p-4 rounded text-dark">
-            <form class="login-form" method="post" action="{% url 'login' %}">
+            <form class="login-form" method="post" action="{% url 'gui:login' %}">
                 {% csrf_token %}
 
                 <input type="hidden" name="next" value="{{ next }}">
