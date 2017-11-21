@@ -4,10 +4,13 @@ from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Activation, Flatten, Reshape, Input, Conv2D, BatchNormalization
 from keras.layers.convolutional import Convolution1D, Convolution2D, MaxPooling2D
 import keras
+from keras.models import load_model
 from data_module.models import Person, Examination, Description, ImageSeries
 from data_module.models import Image as Retina_Image
+from neural_network.models import NeuralNetwork
 from random import shuffle
 import random, re, PIL
+import tensorflow as tf
 import numpy as np
 from skimage.transform import resize
 from keras.preprocessing.image import ImageDataGenerator
@@ -26,7 +29,9 @@ class SequenceDetectionNN(TrainManager):
             super(SequenceDetectionNN, self).__init__()
             self._init_data()
         else:
-            self.model = load_model('sequence_model_size150.hd5')
+            nn = NeuralNetwork.objects.get(model="models/sequence_model_size150.hd5")
+            self.model = load_model(nn.model.path)
+            self.graph = tf.get_default_graph()
 
     def store_method(self):
         return DBNNSave()
@@ -140,8 +145,11 @@ class SequenceDetectionNN(TrainManager):
             for batch_1, batch_2 in zip(batches, batches2):
                 yield [batch_1[0], batch_2[0]], batch_1[1]
 
-    def _prepare_image(self, img):
-        img = PIL.Image.open(img.image).convert('L')
+    def _prepare_image(self, img, ext_image=False):
+        if ext_image:
+            img = PIL.Image.open(img).convert('L')
+        else:
+            img = PIL.Image.open(img.image).convert('L')
         arr_img = np.array(img)
         arr_img = self.preprocess_image(arr_img, img_size_1, img_size_2)
         return arr_img
