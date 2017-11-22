@@ -1,0 +1,40 @@
+{% extends 'page.html' %}
+
+{% load static widget_tweaks %}
+
+{% block title %}Login{% endblock %}
+{% block content %}
+    <div id="view-{{ request.resolver_match.view_name }}" class="container">
+        <div class="bg-light p-4 rounded text-dark">
+            <form class="login-form" method="post" action="{% url 'gui:login' %}">
+                {% csrf_token %}
+
+                <input type="hidden" name="next" value="{{ next }}">
+
+                <label class="sr-only" for="username-input-group">
+                    {{ form.username.label }}
+                </label>
+                <div class="input-group mb-3 fade-in">
+                    <div class="input-group-addon">
+                        <i class="icon icon-user" aria-hidden="true"></i>
+                    </div>
+                    {% render_field form.username name='username' class+='form-control' id='username-input-group' placeholder=form.username.label %}
+                </div>
+
+                <label class="sr-only" for="password-input-group">
+                    {{ form.password.label }}
+                </label>
+                <div class="input-group mb-3 fade-in">
+                    <div class="input-group-addon">
+                        <i class="icon icon-lock" aria-hidden="true"></i>
+                    </div>
+                    {% render_field form.password name='password' class+='form-control' id='password-input-group' placeholder=form.password.label %}
+                </div>
+
+                <button class="btn btn-primary w-100 fade-in" type="submit" name="login">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

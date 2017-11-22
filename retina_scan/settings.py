@@ -25,6 +25,7 @@ SECRET_KEY = 'x(r+8%@h#$cz6ub58$wws3056_zh=h81cc-q(%jz@an*bh23&i'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    'localhost',
     'apacs.cs.put.poznan.pl'
 ]
 
@@ -46,7 +47,9 @@ INSTALLED_APPS = [
     'neural_network',
     'rest_api',
     'preprocessing',
-    'text_processing'
+    'text_processing',
+    'webpack_loader',
+    'widget_tweaks'
 ]
 
 MIDDLEWARE = [
@@ -64,7 +67,7 @@ ROOT_URLCONF = 'retina_scan.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -73,7 +76,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-        },
+        }
     },
 ]
 
@@ -129,4 +132,30 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'dist/', # must end with slash
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map']
+    }
+}
+
+if not DEBUG:
+    WEBPACK_LOADER.update({
+        'DEFAULT':{
+            'BUNDLE_DIR_NAME': 'dist/',
+            'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats-prod.json')
+        }
+    })
+
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media_root')
+
+LOGIN_REDIRECT_URL = 'home'

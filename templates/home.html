@@ -1,0 +1,64 @@
+{% extends 'page.html' %}
+
+{% load static widget_tweaks %}
+
+{% block content %}
+    <div id="view-{{ request.resolver_match.view_name }}" class="container">
+        <div class="text-center mb-4">
+            <h1 class="display-3 mb-3">Left-Right Eye</h1>
+        </div>
+        <div class="bg-light p-4 rounded text-dark">
+            <form class="left-right-eye-form" method="post" action="" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">
+                        Image
+                    </label>
+                    <div class="input-group mb-3 fade-in col-10">
+                        <input type="file" name="image">
+                    </div>
+                </div>
+                <div class="col-12 col-form-label text-center text-primary">
+                    {% if leftright is not None %}
+                        Answer: {{ leftright }}
+                    {% endif %}
+                </div>
+                <button class="btn btn-primary w-100 fade-in" type="submit">
+                    Submit
+                </button>
+            </form>
+        </div>
+
+        <div class="text-center mb-4">
+            <h1 class="display-3 mb-3">Sequence detection</h1>
+        </div>
+        <div class="bg-light p-4 rounded text-dark">
+            <form class="sequence-detection-form" method="post" action="">
+                {% csrf_token %}
+
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">
+                        Image 1
+                    </label>
+                    <div class="input-group mb-3 fade-in col-10">
+                        <input type="file" name="">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">
+                        Image 2
+                    </label>
+                    <div class="input-group mb-3 fade-in col-10">
+                        <input type="file" name="">
+                    </div>
+                </div>
+
+                <button class="btn btn-primary w-100 fade-in" type="submit">
+                    Submit
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
