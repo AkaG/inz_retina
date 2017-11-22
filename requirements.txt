@@ -77,5 +77,3 @@ widgetsnbextension==3.0.6
 win-unicode-console==0.5
 wrapt==1.10.11
 django-multiupload==0.5.2
-django-webpack-loader==0.5.0
-django-widget-tweaks==1.4.1
