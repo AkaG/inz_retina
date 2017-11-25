@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 from PIL import Image
 from keras.models import Model
-
+from keras import backend
 from integrations.left_right_eye_nn.LeftRightEyeNN import LeftRightEyeNN
 from neural_network.nn_manager.GeneratorNNQueryManager import GeneratorNNQueryManager
 
@@ -26,18 +26,23 @@ class LeftRightEyeQuery(GeneratorNNQueryManager):
         gen, gen_copy = itertools.tee(image_gen)
         org = super().model_predict(gen, batch=batch)
         flipped = super().model_predict(self._override_generator(gen_copy), batch=batch)
-        return self._to_category(self._combine_results(org, flipped))
+        return self._predict_category(self._combine_results(org, flipped))
 
-    def _to_category(self, result_dict):
+    def _predict_category(self, result_dict):
         for x in result_dict:
-            if result_dict[x] < 0.45:
-                result_dict[x] = 'L'
-            elif result_dict[x] > 0.55:
-                result_dict[x] = 'R'
-            else:
-                result_dict[x] = 'N'
-
+            res = {}
+            res['value'] = result_dict[x]
+            res['prediction'] = self._to_category(result_dict[x])
+            result_dict[x] = res
         return result_dict
+
+    def _to_category(self, value):
+        if value < 0.45:
+            return 'L'
+        elif value > 0.55:
+            return 'R'
+        else:
+            return 'N'
 
     def _combine_results(self, org, flipped):
         to_return = {}
@@ -63,6 +68,6 @@ class LeftRightEyeQuerySingleton(object):
 
     @classmethod
     def get_instance(cls, *args, **kwargs):
-        if cls.query is None:
-            cls.query = LeftRightEyeQuery()
+        backend.clear_session()
+        cls.query = LeftRightEyeQuery()
         return cls.query
