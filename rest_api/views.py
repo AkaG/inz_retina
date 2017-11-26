@@ -24,7 +24,7 @@ class FileUploadActionsViewSet(generics.GenericAPIView, CsrfExemptMixin):
 
     def post(self, request, *args, **kwargs):
         image = Image.open(request.data['image'])
-        datagen = DataGenerator(self.query.nn.input_shape)
+        datagen = DataGenerator(self.query.input_shape)
         pred = self.query.model_predict(datagen.flow([image, ], [request.data['image'].name, ]), batch=1)
         return Response(pred)
 
