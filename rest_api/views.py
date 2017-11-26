@@ -23,9 +23,14 @@ class FileUploadActionsViewSet(generics.GenericAPIView, CsrfExemptMixin):
         self.query = LeftRightEyeQuerySingleton.get_instance()
 
     def post(self, request, *args, **kwargs):
-        image = Image.open(request.data['image'])
+        imglist = request.data.getlist('image')
+        if len(imglist) == 0:
+            return Response({})
+
+        images = [Image.open(img) for img in imglist]
+        names = [img.name for img in imglist]
         datagen = DataGenerator(self.query.input_shape)
-        pred = self.query.model_predict(datagen.flow([image, ], [request.data['image'].name, ]), batch=1)
+        pred = self.query.model_predict(datagen.flow(images, names), batch=len(images))
         return Response(pred)
 
 
