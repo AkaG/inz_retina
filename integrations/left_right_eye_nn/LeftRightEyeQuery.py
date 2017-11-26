@@ -9,12 +9,8 @@ from integrations.left_right_eye_nn.LeftRightEyeNN import LeftRightEyeNN
 from neural_network.models import NeuralNetwork
 from neural_network.nn_manager.GeneratorNNQueryManager import GeneratorNNQueryManager
 
-nn = NeuralNetwork.objects.all().filter(description=LeftRightEyeNN.db_description)
-if nn.count() > 0:
-    nn = nn.latest('created')
-lr_nn_model = load_model(nn.model.path)
-
-lr_graph = tf.get_default_graph()
+lr_nn_model = None
+lr_graph = None
 
 
 class LeftRightEyeQuery(GeneratorNNQueryManager):
@@ -30,13 +26,25 @@ class LeftRightEyeQuery(GeneratorNNQueryManager):
         return image
 
     def create_model(self) -> Model:
-        # nn = NeuralNetwork.objects.all().filter(description=self.db_description)
-        # if nn.count() > 0:
-        #     nn = nn.latest('created')
         global lr_nn_model
+        global lr_graph
+        if lr_nn_model is None:
+            try:
+                nn = NeuralNetwork.objects.all().filter(description=self.db_description)
+                if nn.count() > 0:
+                    nn = nn.latest('created')
+                lr_nn_model = load_model(nn.model.path)
+                lr_graph = tf.get_default_graph()
+            except IOError:
+                lr_nn_model = None
+                lr_graph = None
+                raise IOError
         return lr_nn_model
 
     def model_predict(self, image_gen, batch=5):
+        if self.model is None:
+            self._init_model()
+
         gen, gen_copy = itertools.tee(image_gen)
         global lr_graph
         with lr_graph.as_default():
