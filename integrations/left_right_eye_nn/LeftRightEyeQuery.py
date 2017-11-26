@@ -65,7 +65,7 @@ class LeftRightEyeQuery(GeneratorNNQueryManager):
         for name in org:
             result = org[name]
             flipped_result = flipped[name]
-            to_return[name] = np.mean([result, 1 - flipped_result])
+            to_return[name] = float('{0:.3f}'.format(np.mean([result, 1 - flipped_result])))
         return to_return
 
     def _override_generator(self, gen):
