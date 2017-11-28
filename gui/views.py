@@ -70,7 +70,12 @@ class ExaminationList(LoginRequiredMixin, ListView):
 
         for examination in queryset:
             examination.patient = examination.person.patient
-            examination.description = dataModels.Description.objects.filter(examination=examination)
+            
+            description = dataModels.Description.objects.filter(examination=examination)
+            if len(description) > 0:
+                examination.description = description[0]
+            else:
+                examination.description = None
 
             print(examination.person.patient)
 
