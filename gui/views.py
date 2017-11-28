@@ -93,8 +93,6 @@ class ExaminationList(LoginRequiredMixin, ListView):
             else:
                 examination.description = None
 
-            print(examination.person.patient)
-
         return queryset
 
 
