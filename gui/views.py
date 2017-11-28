@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.views.generic import View
+from django.views.generic import View, ListView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -42,13 +42,10 @@ class IndexView(LoginRequiredMixin, View):
         return HttpResponseRedirect('/')
 
 
-class PatientList(LoginRequiredMixin, View):
+class PatientList(LoginRequiredMixin, ListView):
     model = models.Patient
     template_name = 'patient_list.html'
     login_url = 'gui:login'
-
-    def get(self, request):
-        return render(request, self.template_name)
 
 
 class PatientAdd(LoginRequiredMixin, CreateView):

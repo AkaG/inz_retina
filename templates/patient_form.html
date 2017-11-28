@@ -16,14 +16,3 @@
     {% endif %}
     {% include 'form.html' %}
 {% endblock %}
-
-{% block javascript %}
-    <script type="text/javascript">
-        $(function () {
-            $('#datetimepicker_birth_date').datetimepicker({
-                viewMode: 'years',
-                format: 'YYYY-MM-DD'
-            });
-        });
-    </script>
-{% endblock %}

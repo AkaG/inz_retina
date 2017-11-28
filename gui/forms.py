@@ -17,7 +17,7 @@ class PatientForm(forms.ModelForm):
 
         widgets = {
             'birth_date': forms.DateInput(attrs={
-                'class': 'datepicker-input',
-                'data-target': '#datetimepicker_date',
+                'type': 'date',
             }),
+            'sex': forms.RadioSelect()
         }
