@@ -59,6 +59,22 @@ class PatientAdd(LoginRequiredMixin, CreateView):
     form_class = forms.PatientForm
     template_name = 'patient_form.html'
     success_url = '/patients'
+    login_url = 'gui:login'
+
+
+class PatientUpdate(LoginRequiredMixin, UpdateView):
+    model = models.Patient
+    form_class = forms.PatientForm
+    template_name = 'patient_form.html'
+    success_url = '/patients'
+    login_url = 'gui:login'
+
+
+class PatientDelete(LoginRequiredMixin, DeleteView):
+    model = models.Patient
+    template_name = 'patient_confirm_delete.html'
+    success_url = '/patients'  
+    login_url = 'gui:login'
 
 
 class ExaminationList(LoginRequiredMixin, ListView):
@@ -101,3 +117,19 @@ class ExaminationAdd(LoginRequiredMixin, FormView):
         print(form.cleaned_data)
 
         return super(ExaminationAdd, self).form_valid(form)
+
+
+class ExaminationUpdate(LoginRequiredMixin, FormView):
+    # TODO
+    model = dataModels.Examination
+    form_class = forms.ExaminationCombinedForm
+    template_name = 'examination_form.html'
+    success_url = '/examinations'
+    login_url = 'gui:login'
+
+
+class ExaminationDelete(LoginRequiredMixin, DeleteView):
+    model = dataModels.Examination
+    template_name = 'examination_confirm_delete.html'
+    success_url = '/examinations'
+    login_url = 'gui:login'
