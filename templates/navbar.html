@@ -12,8 +12,8 @@
         <div class="collapse navbar-collapse" id="navbar-app">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item{% if request.path == '/' %} active{% endif %}">
-                    <a class="nav-link" href="">
-                        <i class="icon icon-dashboard" aria-hidden="true"></i> Dashboard
+                    <a class="nav-link" href="{% url 'gui:patient-list' %}">
+                        <i class="icon icon-dashboard"></i> Patients
                     </a>
                 </li>
             </ul>

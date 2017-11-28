@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'preprocessing',
     'text_processing',
     'webpack_loader',
-    'widget_tweaks'
+    'widget_tweaks',
+    'gui'
 ]
 
 MIDDLEWARE = [

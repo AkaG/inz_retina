@@ -7,6 +7,7 @@ from integrations.sequence_detection_nn.SequenceDetectionQuery import SequenceDe
 from neural_network.nn_manager.DataGenerator import DataGenerator
 from PIL import Image
 
+from gui import models
 
 class IndexView(LoginRequiredMixin, View):
     template_name = 'home.html'
@@ -38,3 +39,12 @@ class IndexView(LoginRequiredMixin, View):
         request.session['leftright'] = pred
 
         return HttpResponseRedirect('/')
+
+
+class PatientList(LoginRequiredMixin, View):
+    #model = models.Patient
+    template_name = 'patient_list.html'
+    login_url = 'gui:login'
+
+    def get(self, request):
+        return render(request, self.template_name)
