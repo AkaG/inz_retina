@@ -3,28 +3,26 @@
 {% load static widget_tweaks %}
 
 {% block content %}
-<h1>Patients</h1>
+<h1>Examinations</h1>
 {% include 'filter.html' %}
 <div class="table-responsive">
-    <table class="table table-striped table-hover patient-list">
+    <table class="table table-striped table-hover examination-list">
         <thead class="thead-inverse">
             <tr>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Birth Date</th>
-                <th>Sex</th>
+                <th>Patient</th>
+                <th>Description</th>
+                <th>Date</th>
                 <th class="text-center">Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% for patient in object_list %}
+            {% for examination in object_list %}
             <tr>
                 <th scope="row">
-                    <a href="#">{{ patient.first_name }}</a>
+                    <a href="#">{{ examination.person.patient }}</a>
                 </th>
-                <td>{{ patient.last_name }}</td>
-                <td>{{ patient.birth_date }}</td>
-                <td>{{ patient.sex }}</td>
+                <td>{{ examination.description }}</td>
+                <td>{{ examination.date }}</td>
                 <td class="text-center">
                     <div class="btn-group btn-group-sm">
                         <a href="" class="btn btn-warning">
@@ -38,14 +36,14 @@
             </tr>
             {% empty %}
             <tr>
-                <th colspan="5">No patients found.</th>
+                <th colspan="5">No examinations found.</th>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
-<a href="{% url 'gui:patient-add' %}" class="btn btn-sm btn-success">
-    Add a Patient
+<a href="{% url 'gui:examination-add' %}" class="btn btn-sm btn-success">
+    Add an Examination
 </a>
 {% endblock %}

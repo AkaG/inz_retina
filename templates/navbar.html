@@ -11,9 +11,14 @@
 
         <div class="collapse navbar-collapse" id="navbar-app">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item{% if request.path == '/' %} active{% endif %}">
+                <li class="nav-item{% if request.path == '/patients/' %} active{% endif %}">
                     <a class="nav-link" href="{% url 'gui:patient-list' %}">
                         <i class="fa fa-users"></i> Patients
+                    </a>
+                </li>
+                <li class="nav-item{% if request.path == '/examinations/' %} active{% endif %}">
+                    <a class="nav-link" href="{% url 'gui:examination-list' %}">
+                        <i class="fa fa-calendar"></i> Examinations
                     </a>
                 </li>
             </ul>

@@ -1,11 +1,14 @@
 from django.db import models
 
+from gui.models import Patient
 
 # Create your models here.
 
 class Person(models.Model):
     code_name = models.TextField()
     sex = models.CharField(max_length=1)
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True)
 
 
 class Examination(models.Model):
@@ -15,7 +18,6 @@ class Examination(models.Model):
     json = models.TextField(blank=True, null=True)
 
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
-
 
 class KeyWords(models.Model):
     word = models.TextField()

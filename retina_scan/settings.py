@@ -32,25 +32,28 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'text_processing',
+    'neural_network',
+    'preprocessing',
+    'integrations',
+    'data_module',
+    'rest_api',
+    'reports',
+    'gui',
+
+    'webpack_loader',
+    'widget_tweaks',
+    'django_filters',
+    'django_extensions',
+    'django_cleanup',
+    'rest_framework',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_extensions',
-    'django_cleanup',
-    'rest_framework',
-    'data_module',
-    'integrations',
-    'reports',
-    'neural_network',
-    'rest_api',
-    'preprocessing',
-    'text_processing',
-    'webpack_loader',
-    'widget_tweaks',
-    'gui'
+    'django.contrib.staticfiles'
 ]
 
 MIDDLEWARE = [

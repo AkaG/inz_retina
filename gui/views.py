@@ -8,7 +8,11 @@ from integrations.sequence_detection_nn.SequenceDetectionQuery import SequenceDe
 from neural_network.nn_manager.DataGenerator import DataGenerator
 from PIL import Image
 
+from django_filters.views import FilterView
+from django_filters import rest_framework as filters
+
 from . import forms, models
+from data_module import models as dataModels
 
 class IndexView(LoginRequiredMixin, View):
     template_name = 'home.html'
@@ -42,10 +46,11 @@ class IndexView(LoginRequiredMixin, View):
         return HttpResponseRedirect('/')
 
 
-class PatientList(LoginRequiredMixin, ListView):
+class PatientList(LoginRequiredMixin, FilterView):
     model = models.Patient
     template_name = 'patient_list.html'
     login_url = 'gui:login'
+    filter_fields = ('first_name', 'last_name')
 
 
 class PatientAdd(LoginRequiredMixin, CreateView):
@@ -53,3 +58,16 @@ class PatientAdd(LoginRequiredMixin, CreateView):
     form_class = forms.PatientForm
     template_name = 'patient_form.html'
     success_url = '/patients'
+
+
+class ExaminationList(LoginRequiredMixin, ListView):
+    model = dataModels.Examination
+    template_name = 'examination_list.html'
+    login_url = 'gui:login'
+
+
+class ExaminationAdd(LoginRequiredMixin, CreateView):
+    model = dataModels.Examination
+    form_class = forms.ExaminationForm
+    template_name = 'examination_form.html'
+    success_url = '/examinations'

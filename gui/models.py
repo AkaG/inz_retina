@@ -1,6 +1,6 @@
 from django.db import models
 
-from data_module.models import Person
+from data_module import models as dataModels
 
 # Create your models here.
 
@@ -14,15 +14,15 @@ class Patient(models.Model):
     birth_date = models.DateField(blank=False, null=False)
     sex = models.CharField(
         max_length=1, choices=GENDER_CHOICES, blank=False, default='M')
-    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['last_name', 'first_name']
 
     def __str__(self):
         return '{} {}'.format(self.first_name, self.last_name)
 
     def save(self, *args, **kwargs):
-        person = Person(sex=self.sex)
-        person.save()
-
-        self.person = person
-        
         super(Patient, self).save(*args, **kwargs)
+
+        person = dataModels.Person(sex=self.sex, patient=self)
+        person.save()
