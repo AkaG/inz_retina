@@ -13,7 +13,7 @@
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item{% if request.path == '/' %} active{% endif %}">
                     <a class="nav-link" href="{% url 'gui:patient-list' %}">
-                        <i class="icon icon-dashboard"></i> Patients
+                        <i class="fa fa-users"></i> Patients
                     </a>
                 </li>
             </ul>
@@ -21,7 +21,7 @@
             {% if user.is_authenticated %}
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <i class="icon icon-user"></i> {{ request.user }},
+                        <i class="fa fa-user"></i> {{ request.user }},
                         <a href="{% url 'gui:logout' %}">Logout</a>
                     </li>
                 </ul>
