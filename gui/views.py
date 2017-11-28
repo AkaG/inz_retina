@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import View
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from integrations.left_right_eye_nn.LeftRightEyeQuery import LeftRightEyeQuerySingleton
@@ -7,7 +8,7 @@ from integrations.sequence_detection_nn.SequenceDetectionQuery import SequenceDe
 from neural_network.nn_manager.DataGenerator import DataGenerator
 from PIL import Image
 
-from gui import models
+from . import forms, models
 
 class IndexView(LoginRequiredMixin, View):
     template_name = 'home.html'
@@ -42,9 +43,16 @@ class IndexView(LoginRequiredMixin, View):
 
 
 class PatientList(LoginRequiredMixin, View):
-    #model = models.Patient
+    model = models.Patient
     template_name = 'patient_list.html'
     login_url = 'gui:login'
 
     def get(self, request):
         return render(request, self.template_name)
+
+
+class PatientAdd(LoginRequiredMixin, CreateView):
+    model = models.Patient
+    form_class = forms.PatientForm
+    template_name = 'patient_form.html'
+    success_url = '/patients'

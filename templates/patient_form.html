@@ -1,0 +1,29 @@
+{% extends 'page.html' %}
+
+{% block title %}
+    {% if object %}
+        {{ object }}
+    {% else %}
+        Add a Patient
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if object %}
+        <h1>Update <span class="text-info">{{ object }}</span></h1>
+    {% else %}
+        <h1>Add a Patient</h1>
+    {% endif %}
+    {% include 'form.html' %}
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        $(function () {
+            $('#datetimepicker_birth_date').datetimepicker({
+                viewMode: 'years',
+                format: 'YYYY-MM-DD'
+            });
+        });
+    </script>
+{% endblock %}

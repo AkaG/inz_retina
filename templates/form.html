@@ -1,0 +1,20 @@
+{% load widget_tweaks %}
+
+<div class="container-fluid">
+    <form role="form" method="post" enctype="multipart/form-data">
+        {% csrf_token %} {% if form.non_field_errors %} {% for error in form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endfor %} {% elif form.errors %}
+        <div class="alert alert-danger" role="alert">
+            <strong>Error:</strong> Some fields have errors. See below for details.
+        </div>
+        {% endif %} {% for field in form %}
+        <div class="form-group row">
+            {% include 'form_field.html' %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
