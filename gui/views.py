@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import View, ListView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from integrations.left_right_eye_nn.LeftRightEyeQuery import LeftRightEyeQuerySingleton
@@ -13,6 +13,7 @@ from django_filters import rest_framework as filters
 
 from . import forms, models
 from data_module import models as dataModels
+
 
 class IndexView(LoginRequiredMixin, View):
     template_name = 'home.html'
@@ -61,13 +62,37 @@ class PatientAdd(LoginRequiredMixin, CreateView):
 
 
 class ExaminationList(LoginRequiredMixin, ListView):
-    model = dataModels.Examination
     template_name = 'examination_list.html'
     login_url = 'gui:login'
+    
+    def get_queryset(self):
+        queryset = dataModels.Examination.objects.all()
+
+        for examination in queryset:
+            examination.patient = examination.person.patient
+            examination.description = dataModels.Description.objects.filter(examination=examination)
+
+            print(examination.person.patient)
+
+        return queryset
 
 
-class ExaminationAdd(LoginRequiredMixin, CreateView):
+class ExaminationAdd(LoginRequiredMixin, FormView):
     model = dataModels.Examination
-    form_class = forms.ExaminationForm
+    form_class = forms.ExaminationCombinedForm
     template_name = 'examination_form.html'
     success_url = '/examinations'
+
+    def form_valid(self, form):
+        person = dataModels.Person.objects.create(patient=form.cleaned_data['patient'])
+        examination = dataModels.Examination.objects.create(
+            person=person,
+            date=form.cleaned_data['date']
+        )
+        dataModels.Description.objects.create(
+            text=form.cleaned_data['text'],
+            examination=examination
+        )
+        print(form.cleaned_data)
+
+        return super(ExaminationAdd, self).form_valid(form)
