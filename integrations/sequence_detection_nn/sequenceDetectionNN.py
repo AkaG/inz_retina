@@ -16,6 +16,8 @@ from skimage.transform import resize
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import load_model
 
+from keras import backend as K
+
 width = 1388
 height = 1038
 
@@ -30,8 +32,9 @@ class SequenceDetectionNN(TrainManager):
             self._init_data()
         else:
             nn = NeuralNetwork.objects.get(model="models/sequence_model_size150.hd5")
+            self.sess = tf.Session()
+            K.set_session(self.sess)
             self.model = load_model(nn.model.path)
-            self.graph = tf.get_default_graph()
 
     def store_method(self):
         return DBNNSave()
