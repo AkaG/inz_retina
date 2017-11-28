@@ -25,9 +25,6 @@
                 <td>{{ examination.date }}</td>
                 <td class="text-center">
                     <div class="btn-group btn-group-sm">
-                        <a href="{% url 'gui:examination-update' examination.id %}" class="btn btn-warning">
-                            <i class="fa fa-pencil"></i>
-                        </a>
                         <a href="{% url 'gui:examination-delete' examination.id %}" class="btn btn-danger">
                             <i class="fa fa-trash"></i>
                         </a>

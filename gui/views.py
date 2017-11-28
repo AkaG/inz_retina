@@ -114,7 +114,11 @@ class ExaminationAdd(LoginRequiredMixin, FormView):
             text=form.cleaned_data['text'],
             examination=examination
         )
-        print(form.cleaned_data)
+
+        images = form.cleaned_data['attachments']
+        for image in images:
+            imageObject = dataModels.Image.objects.create(name = image.name, examination=examination)
+            imageObject.image.save(image.name, image)
 
         return super(ExaminationAdd, self).form_valid(form)
 

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django import forms
+from multiupload.fields import MultiMediaField
 
 from gui import models
 from data_module.models import Examination, Description, Person
@@ -52,6 +53,14 @@ class DescriptionForm(forms.ModelForm):
         fields = [
             'text'
         ]
+        labels = {
+            'text': 'Comment',
+        }
+
+
+class UploadForm(forms.Form):
+    attachments = MultiMediaField(label='Images', min_num=2, max_num=16, media_type='image')
+
 
 class CombinedFormBase(forms.Form):
     form_classes = []
@@ -93,4 +102,4 @@ class CombinedFormBase(forms.Form):
 
 
 class ExaminationCombinedForm(CombinedFormBase):
-    form_classes = [PersonForm, ExaminationForm, DescriptionForm]
+    form_classes = [PersonForm, ExaminationForm, DescriptionForm, UploadForm]

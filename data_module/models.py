@@ -71,4 +71,5 @@ class Image(models.Model):
     height_field = models.IntegerField(default=0, null=True)
     width_field = models.IntegerField(default=0, null=True)
 
-    image_series = models.ForeignKey(ImageSeries, on_delete=models.CASCADE)
+    image_series = models.ForeignKey(ImageSeries, on_delete=models.CASCADE, null=True)
+    examination = models.ForeignKey(Examination, on_delete=models.CASCADE, blank=True, null=True)
