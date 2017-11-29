@@ -3,8 +3,7 @@ from django.views.generic import View, ListView
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from integrations.left_right_eye_nn.LeftRightEyeQuery import LeftRightEyeQuerySingleton
-from integrations.sequence_detection_nn.SequenceDetectionQuery import SequenceDetectionNNSingleton
+from integrations.left_right_eye_nn.LeftRightEyeQuery import LeftRightEyeQuery
 from neural_network.nn_manager.DataGenerator import DataGenerator
 from PIL import Image
 
@@ -37,8 +36,8 @@ class IndexView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         image = Image.open(request.FILES.get('image'))
 
-        query = LeftRightEyeQuerySingleton.get_instance()
-        datagen = DataGenerator(query.nn.input_shape)
+        query = LeftRightEyeQuery()
+        datagen = DataGenerator(query.input_shape)
         pred = query.model_predict(datagen.flow(
             [image, ], [request.FILES.get('image').name, ]), batch=1)
 
