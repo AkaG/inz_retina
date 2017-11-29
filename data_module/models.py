@@ -19,6 +19,7 @@ class Examination(models.Model):
 
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
 
+
 class KeyWords(models.Model):
     word = models.TextField()
 
@@ -72,4 +73,4 @@ class Image(models.Model):
     width_field = models.IntegerField(default=0, null=True)
 
     image_series = models.ForeignKey(ImageSeries, on_delete=models.CASCADE, null=True)
-    examination = models.ForeignKey(Examination, on_delete=models.CASCADE, blank=True, null=True)
+    examination = models.ForeignKey(Examination, on_delete=models.CASCADE, null=True)

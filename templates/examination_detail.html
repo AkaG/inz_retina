@@ -1,0 +1,21 @@
+{% extends 'page.html' %}
+
+{% load static widget_tweaks %}
+
+{% block content %}
+<h1>Examination</h1>
+
+<div class="row">
+    <div class="col-lg-4 col-md-6 pb-3">
+        <p class="lead">
+            Patient <span class="text-secondary">{{examination.person.patient}}</span><br>
+            Description <span class="text-secondary">{{description}}</span><br>
+            Date <span class="text-secondary">{{examination.date}}</span>
+
+            {% for image in images %}
+                <img src="{{image.image.url}}" alt="" class="img-thumbnail" height="300">
+            {% endfor %}
+        </p>
+    </div>
+</div>
+{% endblock %}

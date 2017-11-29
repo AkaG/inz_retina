@@ -20,7 +20,7 @@
             {% for patient in object_list %}
             <tr>
                 <th scope="row">
-                    <a href="#">{{ patient.first_name }}</a>
+                    {{ patient.first_name }}
                 </th>
                 <td>{{ patient.last_name }}</td>
                 <td>{{ patient.birth_date }}</td>

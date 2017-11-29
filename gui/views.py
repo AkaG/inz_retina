@@ -134,3 +134,19 @@ class ExaminationDelete(LoginRequiredMixin, DeleteView):
     template_name = 'examination_confirm_delete.html'
     success_url = '/examinations'
     login_url = 'gui:login'
+
+
+class ExaminationDetail(LoginRequiredMixin, View):
+    template_name = 'examination_detail.html'
+    login_url = 'gui:login'
+
+    def get(self, request, pk):
+        examination = dataModels.Examination.objects.filter(id=pk)[0]
+        description = dataModels.Description.objects.filter(examination=examination)[0]
+        images = dataModels.Image.objects.filter(examination=examination)
+
+        return render(request, self.template_name, {
+            'examination': examination,
+            'description': description.text,
+            'images': images
+        })

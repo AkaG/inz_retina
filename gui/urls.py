@@ -1,5 +1,7 @@
 from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 from gui import views
 
@@ -14,8 +16,11 @@ urlpatterns = [
 
     url(r'^examinations/$', views.ExaminationList.as_view(), name='examination-list'),
     url(r'^examinations/add$', views.ExaminationAdd.as_view(), name='examination-add'),
+    url(r'^examinations/(?P<pk>[0-9]+)/$', views.ExaminationDetail.as_view(), name='examination-detail'),
     url(r'^examinations/(?P<pk>[0-9]+)/edit/$', views.ExaminationUpdate.as_view(), name='examination-update'),
     url(r'^examinations/(?P<pk>[0-9]+)/delete/$', views.ExaminationDelete.as_view(), name='examination-delete'),
 
     url(r'^$', views.IndexView.as_view()),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -19,7 +19,7 @@
             {% for examination in object_list %}
             <tr>
                 <th scope="row">
-                    <a href="#">{{ examination.patient }}</a>
+                    <a href="{% url 'gui:examination-detail' examination.id %}">{{ examination.patient }}</a>
                 </th>
                 <td>{{ examination.description.text }}</td>
                 <td>{{ examination.date }}</td>
