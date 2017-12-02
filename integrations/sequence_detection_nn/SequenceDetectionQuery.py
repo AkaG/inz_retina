@@ -58,6 +58,5 @@ class SequenceDetectionQuery():
         with self.nn.sess.as_default():
             pairs, results_struct = self.create_sequence_pairs(prepared_images, names)
             for pair in pairs:
-                self.predict_pair(pair, results_struct, self.nn)
-            order_predicted = self.get_result(results_struct)
-            return order_predicted, results_struct
+                self.predict_pair(pair,results_struct,self.nn)
+            return self.get_result(results_struct)

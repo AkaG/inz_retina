@@ -131,3 +131,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media_root')
+
+NOTEBOOK_ARGUMENTS = [
+    '--notebook-dir', 'notebooks',
+]
