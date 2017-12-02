@@ -37,13 +37,13 @@ class SequenceDetectionQuery():
         results[pair['first_name']] = results[pair['first_name']] + y
         results[pair['second_name']] = results[pair['second_name']] + (1 - y)
 
-    def get_tau(self, results):
-        sorted_result = sorted(results.items(), key=lambda x: x[1])
+    def get_result(self,results):
+        sorted_result = sorted(results.items(), key=lambda x:x[1])
         order_predicted = []
         for item in sorted_result:
             key, value = item
             order_predicted.append(key)
-        return order_predicted
+        return order_predicted, dict(sorted_result)
 
     def prepare_images(self, images):
         prepared_images = []
@@ -59,5 +59,5 @@ class SequenceDetectionQuery():
             pairs, results_struct = self.create_sequence_pairs(prepared_images, names)
             for pair in pairs:
                 self.predict_pair(pair, results_struct, self.nn)
-            order_predicted = self.get_tau(results_struct)
+            order_predicted = self.get_result(results_struct)
             return order_predicted, results_struct
