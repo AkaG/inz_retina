@@ -17,7 +17,11 @@ class DBNNSave(AbstractNNSave):
             self.nn = nn
 
     def save_model(self, model):
-        self.nn.model.save("nn_model.json", ContentFile(model.to_json()))
+        with tempfile.TemporaryDirectory(dir=settings.MEDIA_ROOT) as temp_dir:
+            file_path = os.path.join(temp_dir, "nn_model.h5")
+            model.save(file_path)
+            with open(file_path, "rb") as model:
+                self.nn.model.save("nn_model.h5", File(model))
 
     def save_weights(self, model):
         with tempfile.TemporaryDirectory(dir=settings.MEDIA_ROOT) as temp_dir:
