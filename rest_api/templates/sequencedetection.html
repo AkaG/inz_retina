@@ -4,12 +4,19 @@
     {{ form.as_p }}
     <input type="submit" value="Send" />
 
-    <br>
+    <br><br>
+    predicted order:
     <br>
     {% for key, value in result_struct.items %}
-        {{key}}: {{value | floatformat:2}}
+        {{key}}: <b>{{value | floatformat:2}}</b>
     <br>
     {% endfor %}
     <br>
-    predicted order: {{ order }}
+
+    differences between next in order images (from the least certain):<br> 
+    {% for img1, img2, diff in differences %}
+    {{img1}} &nbsp {{img2}} &nbsp {{diff | floatformat:2}}
+    <br>
+    {% endfor %}
+    
 </form>

@@ -31,12 +31,26 @@ class FileUploadActionsViewSet(generics.GenericAPIView, CsrfExemptMixin):
         pred = query.model_predict(datagen.flow(images, names), batch=len(images))
         return Response(pred)
 
-
 class UploadView(FormView):
     template_name = 'sequencedetection.html'
     form_class = UploadForm
 
     def form_valid(self, form):
         query = SequenceDetectionQuery()
-        order, result_struct = query.predict(form.cleaned_data['attachments'])
-        return self.render_to_response(self.get_context_data(order=order, result_struct=result_struct))
+        result, differences = query.predict(form.cleaned_data['attachments'])
+        return self.render_to_response(self.get_context_data(result_struct=result, differences=differences))
+
+class SequenceDetectionRest(generics.GenericAPIView, CsrfExemptMixin):
+    queryset = FileUpload.objects.all()
+    serializer_class = FileUploadSerializer
+    permission_classes = (AllowAny,)
+    authentication_classes = []
+
+    def post(self, request, *args, **kwargs):
+        query = SequenceDetectionQuery()
+        imglist = request.data.getlist('images')
+        if len(imglist) == 0:
+            return Response({"No images provided (the key should be named 'images'"})
+
+        result, _ = query.predict(imglist)
+        return Response({'predicted order': result})
