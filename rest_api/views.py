@@ -52,5 +52,5 @@ class SequenceDetectionRest(generics.GenericAPIView, CsrfExemptMixin):
         if len(imglist) == 0:
             return Response({"No images provided (the key should be named 'images'"})
 
-        result, _ = query.predict(imglist)
-        return Response({'predicted order': result})
+        result, differences = query.predict(imglist)
+        return Response({'predicted order': result, 'differences': differences})
