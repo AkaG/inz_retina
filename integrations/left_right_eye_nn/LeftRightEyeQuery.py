@@ -3,18 +3,16 @@ import itertools
 import numpy as np
 import tensorflow as tf
 from PIL import Image
+from keras import backend as K
 from keras.models import Model, load_model
 
-from integrations.left_right_eye_nn.LeftRightEyeNN import LeftRightEyeNN
 from neural_network.models import NeuralNetwork
 from neural_network.nn_manager.GeneratorNNQueryManager import GeneratorNNQueryManager
 
-from keras import backend as K
-
 
 class LeftRightEyeQuery(GeneratorNNQueryManager):
-    input_shape = LeftRightEyeNN.input_shape
-    db_description = LeftRightEyeNN.db_description
+    input_shape = (100, 100, 1)
+    db_description = 'left_right_eye2'
 
     def __init__(self):
         self.model = None
