@@ -1,11 +1,14 @@
 from django.db import models
 
+from gui.models import Patient
 
 # Create your models here.
 
 class Person(models.Model):
     code_name = models.TextField()
     sex = models.CharField(max_length=1)
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True)
 
 
 class Examination(models.Model):
@@ -69,4 +72,5 @@ class Image(models.Model):
     height_field = models.IntegerField(default=0, null=True)
     width_field = models.IntegerField(default=0, null=True)
 
-    image_series = models.ForeignKey(ImageSeries, on_delete=models.CASCADE)
+    image_series = models.ForeignKey(ImageSeries, on_delete=models.CASCADE, null=True)
+    examination = models.ForeignKey(Examination, on_delete=models.CASCADE, null=True)

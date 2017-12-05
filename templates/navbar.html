@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block nav %}
+    <nav class="navbar navbar-expand-md navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="/"><span class="text-info">Retina scan</a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbar-app">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbar-app">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item{% if request.path == '/patients/' %} active{% endif %}">
+                    <a class="nav-link" href="{% url 'gui:patient-list' %}">
+                        <i class="fa fa-users"></i> Patients
+                    </a>
+                </li>
+                <li class="nav-item{% if request.path == '/examinations/' %} active{% endif %}">
+                    <a class="nav-link" href="{% url 'gui:examination-list' %}">
+                        <i class="fa fa-calendar"></i> Examinations
+                    </a>
+                </li>
+            </ul>
+
+            {% if user.is_authenticated %}
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <i class="fa fa-user"></i> {{ request.user }},
+                        <a href="{% url 'gui:logout' %}">Logout</a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+    </nav>
+{% endblock %}
