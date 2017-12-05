@@ -162,7 +162,7 @@ if not DEBUG:
     })
 
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media_root')
-MEDIA_URL = '/'
+MEDIA_URL = '/media/'
 
 LOGIN_REDIRECT_URL = 'home'
 
