@@ -140,11 +140,17 @@ class ExaminationDetail(LoginRequiredMixin, View):
         examination = models.Examination.objects.filter(id=pk)[0]
         description = models.Description.objects.filter(examination=examination)[0]
 
-        image_series = models.ImageSeries.objects.filter(examination=examination)
-        images = models.Image.objects.filter(image_series=image_series)
+        image_series_unknown = models.ImageSeries.objects.filter(name='unknown', examination=examination)
+        image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
+        image_series_right = models.ImageSeries.objects.filter(eye='R', examination=examination)
+        images_unknown = models.Image.objects.filter(image_series=image_series_unknown)
+        images_left = models.Image.objects.filter(image_series=image_series_left)
+        images_right = models.Image.objects.filter(image_series=image_series_right)
 
         return render(request, self.template_name, {
             'examination': examination,
             'description': description.text,
-            'images': images
+            'images_unknown': images_unknown,
+            'images_left': images_left,
+            'images_right': images_right
         })
