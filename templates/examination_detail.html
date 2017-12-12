@@ -24,7 +24,12 @@
             {% for image in images_unknown %}
             <div class="col-lg-3 col-md-4">
                 <img src="{{image.image.url}}" alt="" class="img-thumbnail mt-3 mb-1" height="300"> 
-                <span style="word-wrap: break-word;">{{image.name}}</span><br>
+                <span style="word-wrap: break-word;">
+                    {% if image.order %}
+                    <strong>{{image.order}}.</strong>
+                    {% endif %}
+                    {{image.name}}
+                </span><br>
                 <a href="{% url 'gui:examination-image-change-left' examination.id image.id %}"><button class="btn btn-outline-info mt-1">Change to LEFT</button></a>
                 <a href="{% url 'gui:examination-image-change-right' examination.id image.id %}"><button class="btn btn-outline-info mt-1">Change to RIGHT</button></a>
                 <br>
@@ -39,7 +44,12 @@
             {% for image in images_left %}
             <div class="col-lg-3 col-md-4">
                 <img src="{{image.image.url}}" alt="" class="img-thumbnail mt-3 mb-1" height="300"> 
-                <span style="word-wrap: break-word;">{{image.name}}</span><br>
+                <span style="word-wrap: break-word;">
+                    {% if image.order %}
+                    <strong>{{image.order}}.</strong>
+                    {% endif %}
+                    {{image.name}}
+                </span><br>
                 <a href="{% url 'gui:examination-image-change-right' examination.id image.id %}"><button class="btn btn-outline-info mt-1">Change to RIGHT</button></a>
                 <br>
             </div>
@@ -64,6 +74,34 @@
             </div>
             {% endfor %}
         </div>
+        {% endif %}
+
+        {% if result_right %}
+            <br><br>
+            predicted order (right eye):<br>
+            {% for key, value in result_right.items %}
+                {{key}}: <b>{{value | floatformat:2}}</b><br>
+            {% endfor %}
+            <br>
+
+            differences between next in order images (from the least certain):<br> 
+            {% for img1, img2, diff in differences_right %}
+                {{img1}} &nbsp {{img2}} &nbsp {{diff | floatformat:2}}<br>
+            {% endfor %}
+        {% endif %}
+
+        {% if result_left %}
+            <br><br>
+            predicted order (left eye):<br>
+            {% for key, value in result_left.items %}
+                {{key}}: <b>{{value | floatformat:2}}</b><br>
+            {% endfor %}
+            <br>
+
+            differences between next in order images (from the least certain):<br> 
+            {% for img1, img2, diff in differences_left %}
+                {{img1}} &nbsp {{img2}} &nbsp {{diff | floatformat:2}}<br>
+            {% endfor %}
         {% endif %}
     </div>  
 </div>

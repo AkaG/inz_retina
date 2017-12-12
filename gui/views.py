@@ -152,12 +152,29 @@ class ExaminationDetail(LoginRequiredMixin, View):
         images_left = models.Image.objects.filter(image_series=image_series_left).order_by('order')
         images_right = models.Image.objects.filter(image_series=image_series_right).order_by('order')
 
+        result_left = request.session.get('result_left')
+        result_right = request.session.get('result_right')
+        differences_left = request.session.get('differences_left')
+        differences_right = request.session.get('differences_right')
+
+        try:
+            del request.session['result_left']
+            del request.session['result_right']
+            del request.session['differences_left']
+            del request.session['differences_right']
+        except KeyError:
+            pass
+
         return render(request, self.template_name, {
             'examination': examination,
             'description': description.text,
             'images_unknown': images_unknown,
             'images_left': images_left,
-            'images_right': images_right
+            'images_right': images_right,
+            'result_right': result_right,
+            'result_left': result_left,
+            'differences_left': differences_left,
+            'differences_right': differences_right
         })
 
 
@@ -207,6 +224,7 @@ class LeftRightEyeNet(LoginRequiredMixin, View):
             if prediction == 'N':
                 image.image_series = image_series_unknown
 
+            image.order = None
             image.save()
 
         return redirect('gui:examination-detail', pk=examination.id)
@@ -225,6 +243,7 @@ class ImageChangeLeft(LoginRequiredMixin, View):
         else:
             image_series_left = image_series_left[0]
 
+        image.order = None
         image.image_series = image_series_left
         image.save()
 
@@ -246,6 +265,7 @@ class ImageChangeRight(LoginRequiredMixin, View):
         else:
             image_series_right = image_series_right[0]
 
+        image.order = None
         image.image_series = image_series_right
         image.save()
 
@@ -269,6 +289,9 @@ class SequenceDetectionNet(LoginRequiredMixin, View):
             image.order = pos + 1
             image.save()
 
+        request.session['result_right'] = result
+        request.session['differences_right'] = differences
+
         image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
         images_left = models.Image.objects.filter(image_series=image_series_left)
         images = [image.image for image in images_left]
@@ -279,5 +302,7 @@ class SequenceDetectionNet(LoginRequiredMixin, View):
             image.order = pos + 1
             image.save()
 
+        request.session['result_left'] = result
+        request.session['differences_left'] = differences
 
         return redirect('gui:examination-detail', pk=examination.id)
