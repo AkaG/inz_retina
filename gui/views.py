@@ -168,15 +168,18 @@ class LeftRightEyeNet(LoginRequiredMixin, View):
         datagen = DataGenerator(query.input_shape)
         examination = models.Examination.objects.filter(id=pk)[0]
 
+        image_series_all = models.ImageSeries.objects.filter(examination=examination)
         image_series_unknown = models.ImageSeries.objects.filter(name='unknown', examination=examination)
         image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
         image_series_right = models.ImageSeries.objects.filter(eye='R', examination=examination)
-        images_unknown = models.Image.objects.filter(image_series=image_series_unknown)
-        images = [Image.open(image.image) for image in images_unknown]
-        names = [image.name for image in images_unknown]
+
+        images_all = models.Image.objects.filter(image_series=image_series_unknown) | models.Image.objects.filter(
+            image_series=image_series_right) | models.Image.objects.filter(image_series=image_series_left)
+        images = [Image.open(image.image) for image in images_all]
+        names = [image.name for image in images_all]
 
         pred = query.model_predict(datagen.flow(
-            images, names), batch=len(images_unknown)
+            images, names), batch=len(images_all)
         )
 
         if len(image_series_unknown) == 0:
@@ -194,7 +197,7 @@ class LeftRightEyeNet(LoginRequiredMixin, View):
         else:
             image_series_right = image_series_right[0]
 
-        for image in images_unknown:
+        for image in images_all:
             prediction = pred[image.name]['prediction']
             if prediction == 'L':
                 image.image_series = image_series_left
