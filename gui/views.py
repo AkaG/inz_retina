@@ -4,6 +4,7 @@ from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteVi
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from integrations.left_right_eye_nn.LeftRightEyeQuery import LeftRightEyeQuery
+from integrations.sequence_detection_nn.SequenceDetectionQuery import SequenceDetectionQuery
 from neural_network.nn_manager.DataGenerator import DataGenerator
 from PIL import Image
 
@@ -147,9 +148,9 @@ class ExaminationDetail(LoginRequiredMixin, View):
         image_series_unknown = models.ImageSeries.objects.filter(name='unknown', examination=examination)
         image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
         image_series_right = models.ImageSeries.objects.filter(eye='R', examination=examination)
-        images_unknown = models.Image.objects.filter(image_series=image_series_unknown)
-        images_left = models.Image.objects.filter(image_series=image_series_left)
-        images_right = models.Image.objects.filter(image_series=image_series_right)
+        images_unknown = models.Image.objects.filter(image_series=image_series_unknown).order_by('order')
+        images_left = models.Image.objects.filter(image_series=image_series_left).order_by('order')
+        images_right = models.Image.objects.filter(image_series=image_series_right).order_by('order')
 
         return render(request, self.template_name, {
             'examination': examination,
@@ -247,5 +248,36 @@ class ImageChangeRight(LoginRequiredMixin, View):
 
         image.image_series = image_series_right
         image.save()
+
+        return redirect('gui:examination-detail', pk=examination.id)
+
+
+class SequenceDetectionNet(LoginRequiredMixin, View):
+    login_url = 'gui:login'
+
+    def get(self, request, pk):
+        query = SequenceDetectionQuery()
+        examination = models.Examination.objects.filter(id=pk)[0]
+
+        image_series_right = models.ImageSeries.objects.filter(eye='R', examination=examination)
+        images_right = models.Image.objects.filter(image_series=image_series_right)
+        images = [image.image for image in images_right]
+        result, differences = query.predict(images)
+        result_keys = result.keys()
+        for image in images_right:
+            pos = list(result_keys).index(image.image.name)
+            image.order = pos + 1
+            image.save()
+
+        image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
+        images_left = models.Image.objects.filter(image_series=image_series_left)
+        images = [image.image for image in images_left]
+        result, differences = query.predict(images)
+        result_keys = result.keys()
+        for image in images_left:
+            pos = list(result_keys).index(image.image.name)
+            image.order = pos + 1
+            image.save()
+
 
         return redirect('gui:examination-detail', pk=examination.id)

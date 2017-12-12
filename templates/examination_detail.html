@@ -53,7 +53,12 @@
             {% for image in images_right %}
             <div class="col-lg-3 col-md-4">
                 <img src="{{image.image.url}}" alt="" class="img-thumbnail mt-3 mb-1" height="300"> 
-                <span style="word-wrap: break-word;">{{image.name}}</span><br>
+                <span style="word-wrap: break-word;">
+                    {% if image.order %}
+                    <strong>{{image.order}}.</strong>
+                    {% endif %}
+                    {{image.name}}
+                </span><br>
                 <a href="{% url 'gui:examination-image-change-left' examination.id image.id %}"><button class="btn btn-outline-info mt-1">Change to LEFT</button></a>
                 <br>
             </div>

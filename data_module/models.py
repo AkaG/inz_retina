@@ -78,5 +78,6 @@ class Image(models.Model):
     )
     height_field = models.IntegerField(default=0, null=True)
     width_field = models.IntegerField(default=0, null=True)
+    order = models.IntegerField(blank=True, null=True)
 
     image_series = models.ForeignKey(ImageSeries, on_delete=models.CASCADE, null=True)
