@@ -206,3 +206,43 @@ class LeftRightEyeNet(LoginRequiredMixin, View):
             image.save()
 
         return redirect('gui:examination-detail', pk=examination.id)
+
+
+class ImageChangeLeft(LoginRequiredMixin, View):
+    login_url = 'gui:login'
+
+    def get(self, request, pk, id):
+        examination = models.Examination.objects.filter(id=pk)[0]
+        image = models.Image.objects.filter(id=id)[0]
+        image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
+
+        if len(image_series_left) == 0:
+            image_series_left = models.ImageSeries.objects.create(eye='L', examination=examination)
+        else:
+            image_series_left = image_series_left[0]
+
+        image.image_series = image_series_left
+        image.save()
+
+        return redirect('gui:examination-detail', pk=examination.id)
+
+
+class ImageChangeRight(LoginRequiredMixin, View):
+    login_url = 'gui:login'
+
+    def get(self, request, pk, id):
+        examination = models.Examination.objects.filter(id=pk)[0]
+        image = models.Image.objects.filter(id=id)[0]
+        image_series_right = models.ImageSeries.objects.filter(
+            eye='R', examination=examination)
+
+        if len(image_series_right) == 0:
+            image_series_right = models.ImageSeries.objects.create(
+                eye='R', examination=examination)
+        else:
+            image_series_right = image_series_right[0]
+
+        image.image_series = image_series_right
+        image.save()
+
+        return redirect('gui:examination-detail', pk=examination.id)

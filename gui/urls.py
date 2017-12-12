@@ -23,6 +23,9 @@ urlpatterns = [
     url(r'^examinations/(?P<pk>[0-9]+)/leftRightEyeNet/$', views.LeftRightEyeNet.as_view(), name='examination-left-right-eye'),
     url(r'^examinations/(?P<pk>[0-9]+)/sequenceDetectionNet/$', views.ExaminationUpdate.as_view(), name='examination-sequence-detection'),
 
+    url(r'^examinations/(?P<pk>[0-9]+)/changeLeft/(?P<id>[0-9]+)/$', views.ImageChangeLeft.as_view(), name='examination-image-change-left'),
+    url(r'^examinations/(?P<pk>[0-9]+)/changeRight/(?P<id>[0-9]+)/$', views.ImageChangeRight.as_view(), name='examination-image-change-right'),
+
     url(r'^$', views.IndexView.as_view()),
 ]
 
