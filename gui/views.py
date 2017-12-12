@@ -109,6 +109,8 @@ class ExaminationAdd(LoginRequiredMixin, FormView):
             text=form.cleaned_data['text'],
             examination=examination
         )
+        models.ImageSeries.objects.create(eye='L', examination=examination)
+        models.ImageSeries.objects.create(eye='R', examination=examination)
         image_series = models.ImageSeries.objects.create(name='unknown', examination=examination)
         images = form.cleaned_data['attachments']
         for image in images:
@@ -156,3 +158,51 @@ class ExaminationDetail(LoginRequiredMixin, View):
             'images_left': images_left,
             'images_right': images_right
         })
+
+
+class LeftRightEyeNet(LoginRequiredMixin, View):
+    login_url = 'gui:login'
+
+    def get(self, request, pk):
+        query = LeftRightEyeQuery()
+        datagen = DataGenerator(query.input_shape)
+        examination = models.Examination.objects.filter(id=pk)[0]
+
+        image_series_unknown = models.ImageSeries.objects.filter(name='unknown', examination=examination)
+        image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
+        image_series_right = models.ImageSeries.objects.filter(eye='R', examination=examination)
+        images_unknown = models.Image.objects.filter(image_series=image_series_unknown)
+        images = [Image.open(image.image) for image in images_unknown]
+        names = [image.name for image in images_unknown]
+
+        pred = query.model_predict(datagen.flow(
+            images, names), batch=len(images_unknown)
+        )
+
+        if len(image_series_unknown) == 0:
+            image_series_unknown = models.ImageSeries.objects.create(name='unknown', examination=examination)
+        else:
+            image_series_unknown = image_series_unknown[0]
+
+        if len(image_series_left) == 0:
+            image_series_left = models.ImageSeries.objects.create(eye='L', examination=examination)
+        else:
+            image_series_left = image_series_left[0]
+
+        if len(image_series_right) == 0:
+            image_series_right = models.ImageSeries.objects.create(eye='R', examination=examination)
+        else:
+            image_series_right = image_series_right[0]
+
+        for image in images_unknown:
+            prediction = pred[image.name]['prediction']
+            if prediction == 'L':
+                image.image_series = image_series_left
+            if prediction == 'R':
+                image.image_series = image_series_right
+            if prediction == 'N':
+                image.image_series = image_series_unknown
+
+            image.save()
+
+        return redirect('gui:examination-detail', pk=examination.id)

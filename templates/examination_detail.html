@@ -10,7 +10,9 @@
         <p class="lead text-center">
             <span class="display-4">{{examination.person}}</span><br>
             Description <span class="text-info">{{description}}</span><br>
-            Date <span class="text-info">{{examination.date}}</span>
+            Date <span class="text-info">{{examination.date}}</span><br>
+            <a href="{% url 'gui:examination-left-right-eye' examination.id %}"><button class="btn btn-primary mt-2">LeftRightEyeNet</button></a><br>
+            <a href="{% url 'gui:examination-sequence-detection' examination.id %}"><button class="btn btn-primary mt-2">SequenceDetectionNet</button></a><br>
         </p>
     </div>
 </div>
@@ -36,8 +38,10 @@
         <div class="row text-center">
             {% for image in images_left %}
             <div class="col-lg-3 col-md-4">
-                <img src="{{image.image.url}}" alt="" class="img-thumbnail" height="300">
-                <button class="btn btn-outline-info">Change to RIGHT</button>
+                <img src="{{image.image.url}}" alt="" class="img-thumbnail mt-3 mb-1" height="300"> 
+                <span>{{image.name}}</span><br>
+                <button class="btn btn-outline-info mt-1">Change to RIGHT</button>
+                <br>
             </div>
             {% endfor %}
         </div>
@@ -48,8 +52,10 @@
         <div class="row text-center">
             {% for image in images_right %}
             <div class="col-lg-3 col-md-4">
-                <img src="{{image.image.url}}" alt="" class="img-thumbnail" height="300"> 
-                <button class="btn btn-outline-info">Change to LEFT</button>
+                <img src="{{image.image.url}}" alt="" class="img-thumbnail mt-3 mb-1" height="300"> 
+                <span>{{image.name}}</span><br>
+                <button class="btn btn-outline-info mt-1">Change to LEFT</button>
+                <br>
             </div>
             {% endfor %}
         </div>

@@ -12,6 +12,7 @@ class PatientForm(forms.ModelForm):
         fields = [
             'first_name',
             'last_name',
+            'code_name',
             'birth_date',
             'sex'
         ]
