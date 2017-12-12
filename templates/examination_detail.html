@@ -5,17 +5,104 @@
 {% block content %}
 <h1>Examination</h1>
 
-<div class="row">
-    <div class="col-lg-4 col-md-6 pb-3">
-        <p class="lead">
-            Patient <span class="text-secondary">{{examination.person.patient}}</span><br>
-            Description <span class="text-secondary">{{description}}</span><br>
-            Date <span class="text-secondary">{{examination.date}}</span>
-
-            {% for image in images %}
-                <img src="{{image.image.url}}" alt="" class="img-thumbnail" height="300">
-            {% endfor %}
+<div class="row patient-detail-column">
+    <div class="col-lg-3 pb-3">
+        <p class="lead text-center">
+            <span class="display-4">{{examination.person}}</span><br>
+            Description <span class="text-info">{{description}}</span><br>
+            Date <span class="text-info">{{examination.date}}</span><br>
+            <a href="{% url 'gui:examination-left-right-eye' examination.id %}"><button class="btn btn-primary mt-2">LeftRightEyeNet</button></a><br>
+            <a href="{% url 'gui:examination-sequence-detection' examination.id %}"><button class="btn btn-primary mt-2">SequenceDetectionNet</button></a><br>
         </p>
     </div>
+</div>
+<div class="row">
+    <div class="col-lg-9 cold-md-6 offset-lg-3">
+        {% if images_unknown %}
+        <h2>Eye: unknown</h2>
+        <div class="row text-center">
+            {% for image in images_unknown %}
+            <div class="col-lg-3 col-md-4">
+                <img src="{{image.image.url}}" alt="" class="img-thumbnail mt-3 mb-1" height="300"> 
+                <span style="word-wrap: break-word;">
+                    {% if image.order %}
+                    <strong>{{image.order}}.</strong>
+                    {% endif %}
+                    {{image.name}}
+                </span><br>
+                <a href="{% url 'gui:examination-image-change-left' examination.id image.id %}"><button class="btn btn-outline-info mt-1">Change to LEFT</button></a>
+                <a href="{% url 'gui:examination-image-change-right' examination.id image.id %}"><button class="btn btn-outline-info mt-1">Change to RIGHT</button></a>
+                <br>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if images_left %}
+        <h2 class="mt-2">Eye: left</h2>
+        <div class="row text-center">
+            {% for image in images_left %}
+            <div class="col-lg-3 col-md-4">
+                <img src="{{image.image.url}}" alt="" class="img-thumbnail mt-3 mb-1" height="300"> 
+                <span style="word-wrap: break-word;">
+                    {% if image.order %}
+                    <strong>{{image.order}}.</strong>
+                    {% endif %}
+                    {{image.name}}
+                </span><br>
+                <a href="{% url 'gui:examination-image-change-right' examination.id image.id %}"><button class="btn btn-outline-info mt-1">Change to RIGHT</button></a>
+                <br>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if images_right %}
+        <h2 class="mt-2">Eye: right</h2>
+        <div class="row text-center">
+            {% for image in images_right %}
+            <div class="col-lg-3 col-md-4">
+                <img src="{{image.image.url}}" alt="" class="img-thumbnail mt-3 mb-1" height="300"> 
+                <span style="word-wrap: break-word;">
+                    {% if image.order %}
+                    <strong>{{image.order}}.</strong>
+                    {% endif %}
+                    {{image.name}}
+                </span><br>
+                <a href="{% url 'gui:examination-image-change-left' examination.id image.id %}"><button class="btn btn-outline-info mt-1">Change to LEFT</button></a>
+                <br>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if result_right %}
+            <br><br>
+            predicted order (right eye):<br>
+            {% for key, value in result_right.items %}
+                {{key}}: <b>{{value | floatformat:2}}</b><br>
+            {% endfor %}
+            <br>
+
+            differences between next in order images (from the least certain):<br> 
+            {% for img1, img2, diff in differences_right %}
+                {{img1}} &nbsp {{img2}} &nbsp {{diff | floatformat:2}}<br>
+            {% endfor %}
+        {% endif %}
+
+        {% if result_left %}
+            <br><br>
+            predicted order (left eye):<br>
+            {% for key, value in result_left.items %}
+                {{key}}: <b>{{value | floatformat:2}}</b><br>
+            {% endfor %}
+            <br>
+
+            differences between next in order images (from the least certain):<br> 
+            {% for img1, img2, diff in differences_left %}
+                {{img1}} &nbsp {{img2}} &nbsp {{diff | floatformat:2}}<br>
+            {% endfor %}
+        {% endif %}
+    </div>  
 </div>
 {% endblock %}

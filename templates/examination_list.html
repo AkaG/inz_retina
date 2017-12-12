@@ -4,9 +4,9 @@
 
 {% block content %}
 <h1>Examinations</h1>
-
+{% include 'filter.html' %}
 <div class="table-responsive">
-    <table class="table table-striped table-hover examination-list">
+    <table class="table table-light table-striped table-hover examination-list">
         <thead class="thead-inverse">
             <tr>
                 <th>Patient</th>
@@ -19,7 +19,7 @@
             {% for examination in object_list %}
             <tr>
                 <th scope="row">
-                    <a href="{% url 'gui:examination-detail' examination.id %}">{{ examination.patient }}</a>
+                    <a class="text-info" href="{% url 'gui:examination-detail' examination.id %}">{{ examination.person }}</a>
                 </th>
                 <td>{{ examination.description.text }}</td>
                 <td>{{ examination.date }}</td>

@@ -4,15 +4,15 @@ from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteVi
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from integrations.left_right_eye_nn.LeftRightEyeQuery import LeftRightEyeQuery
+from integrations.sequence_detection_nn.SequenceDetectionQuery import SequenceDetectionQuery
 from neural_network.nn_manager.DataGenerator import DataGenerator
 from PIL import Image
 
 from django_filters.views import FilterView
 from django_filters import rest_framework as filters
 
-from . import forms, models
-from data_module import models as dataModels
-
+from . import forms
+from data_module import models
 
 class IndexView(LoginRequiredMixin, View):
     template_name = 'home.html'
@@ -47,14 +47,14 @@ class IndexView(LoginRequiredMixin, View):
 
 
 class PatientList(LoginRequiredMixin, FilterView):
-    model = models.Patient
+    model = models.Person
     template_name = 'patient_list.html'
     login_url = 'gui:login'
     filter_fields = ('first_name', 'last_name')
 
 
 class PatientAdd(LoginRequiredMixin, CreateView):
-    model = models.Patient
+    model = models.Person
     form_class = forms.PatientForm
     template_name = 'patient_form.html'
     success_url = '/patients'
@@ -62,7 +62,7 @@ class PatientAdd(LoginRequiredMixin, CreateView):
 
 
 class PatientUpdate(LoginRequiredMixin, UpdateView):
-    model = models.Patient
+    model = models.Person
     form_class = forms.PatientForm
     template_name = 'patient_form.html'
     success_url = '/patients'
@@ -70,23 +70,23 @@ class PatientUpdate(LoginRequiredMixin, UpdateView):
 
 
 class PatientDelete(LoginRequiredMixin, DeleteView):
-    model = models.Patient
+    model = models.Person
     template_name = 'patient_confirm_delete.html'
     success_url = '/patients'  
     login_url = 'gui:login'
 
 
-class ExaminationList(LoginRequiredMixin, ListView):
+class ExaminationList(LoginRequiredMixin, FilterView):
+    model = models.Examination
     template_name = 'examination_list.html'
     login_url = 'gui:login'
+    filter_fields = ('person',)
     
     def get_queryset(self):
-        queryset = dataModels.Examination.objects.all()
+        queryset = models.Examination.objects.all()
 
         for examination in queryset:
-            examination.patient = examination.person.patient
-            
-            description = dataModels.Description.objects.filter(examination=examination)
+            description = models.Description.objects.filter(examination=examination)
             if len(description) > 0:
                 examination.description = description[0]
             else:
@@ -96,25 +96,26 @@ class ExaminationList(LoginRequiredMixin, ListView):
 
 
 class ExaminationAdd(LoginRequiredMixin, FormView):
-    model = dataModels.Examination
+    model = models.Examination
     form_class = forms.ExaminationCombinedForm
     template_name = 'examination_form.html'
     success_url = '/examinations'
 
     def form_valid(self, form):
-        person = dataModels.Person.objects.create(patient=form.cleaned_data['patient'])
-        examination = dataModels.Examination.objects.create(
-            person=person,
+        examination = models.Examination.objects.create(
+            person=form.cleaned_data['person'],
             date=form.cleaned_data['date']
         )
-        dataModels.Description.objects.create(
+        models.Description.objects.create(
             text=form.cleaned_data['text'],
             examination=examination
         )
-
+        models.ImageSeries.objects.create(eye='L', examination=examination)
+        models.ImageSeries.objects.create(eye='R', examination=examination)
+        image_series = models.ImageSeries.objects.create(name='unknown', examination=examination)
         images = form.cleaned_data['attachments']
         for image in images:
-            imageObject = dataModels.Image.objects.create(name = image.name, examination=examination)
+            imageObject = models.Image.objects.create(name=image.name, image_series=image_series)
             imageObject.image.save(image.name, image)
 
         return super(ExaminationAdd, self).form_valid(form)
@@ -122,7 +123,7 @@ class ExaminationAdd(LoginRequiredMixin, FormView):
 
 class ExaminationUpdate(LoginRequiredMixin, FormView):
     # TODO
-    model = dataModels.Examination
+    model = models.Examination
     form_class = forms.ExaminationCombinedForm
     template_name = 'examination_form.html'
     success_url = '/examinations'
@@ -130,7 +131,7 @@ class ExaminationUpdate(LoginRequiredMixin, FormView):
 
 
 class ExaminationDelete(LoginRequiredMixin, DeleteView):
-    model = dataModels.Examination
+    model = models.Examination
     template_name = 'examination_confirm_delete.html'
     success_url = '/examinations'
     login_url = 'gui:login'
@@ -141,12 +142,167 @@ class ExaminationDetail(LoginRequiredMixin, View):
     login_url = 'gui:login'
 
     def get(self, request, pk):
-        examination = dataModels.Examination.objects.filter(id=pk)[0]
-        description = dataModels.Description.objects.filter(examination=examination)[0]
-        images = dataModels.Image.objects.filter(examination=examination)
+        examination = models.Examination.objects.filter(id=pk)[0]
+        description = models.Description.objects.filter(examination=examination)[0]
+
+        image_series_unknown = models.ImageSeries.objects.filter(name='unknown', examination=examination)
+        image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
+        image_series_right = models.ImageSeries.objects.filter(eye='R', examination=examination)
+        images_unknown = models.Image.objects.filter(image_series=image_series_unknown).order_by('order')
+        images_left = models.Image.objects.filter(image_series=image_series_left).order_by('order')
+        images_right = models.Image.objects.filter(image_series=image_series_right).order_by('order')
+
+        result_left = request.session.get('result_left')
+        result_right = request.session.get('result_right')
+        differences_left = request.session.get('differences_left')
+        differences_right = request.session.get('differences_right')
+
+        try:
+            del request.session['result_left']
+            del request.session['result_right']
+            del request.session['differences_left']
+            del request.session['differences_right']
+        except KeyError:
+            pass
 
         return render(request, self.template_name, {
             'examination': examination,
             'description': description.text,
-            'images': images
+            'images_unknown': images_unknown,
+            'images_left': images_left,
+            'images_right': images_right,
+            'result_right': result_right,
+            'result_left': result_left,
+            'differences_left': differences_left,
+            'differences_right': differences_right
         })
+
+
+class LeftRightEyeNet(LoginRequiredMixin, View):
+    login_url = 'gui:login'
+
+    def get(self, request, pk):
+        query = LeftRightEyeQuery()
+        datagen = DataGenerator(query.input_shape)
+        examination = models.Examination.objects.filter(id=pk)[0]
+
+        image_series_all = models.ImageSeries.objects.filter(examination=examination)
+        image_series_unknown = models.ImageSeries.objects.filter(name='unknown', examination=examination)
+        image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
+        image_series_right = models.ImageSeries.objects.filter(eye='R', examination=examination)
+
+        images_all = models.Image.objects.filter(image_series=image_series_unknown) | models.Image.objects.filter(
+            image_series=image_series_right) | models.Image.objects.filter(image_series=image_series_left)
+        images = [Image.open(image.image) for image in images_all]
+        names = [image.name for image in images_all]
+
+        pred = query.model_predict(datagen.flow(
+            images, names), batch=len(images_all)
+        )
+
+        if len(image_series_unknown) == 0:
+            image_series_unknown = models.ImageSeries.objects.create(name='unknown', examination=examination)
+        else:
+            image_series_unknown = image_series_unknown[0]
+
+        if len(image_series_left) == 0:
+            image_series_left = models.ImageSeries.objects.create(eye='L', examination=examination)
+        else:
+            image_series_left = image_series_left[0]
+
+        if len(image_series_right) == 0:
+            image_series_right = models.ImageSeries.objects.create(eye='R', examination=examination)
+        else:
+            image_series_right = image_series_right[0]
+
+        for image in images_all:
+            prediction = pred[image.name]['prediction']
+            if prediction == 'L':
+                image.image_series = image_series_left
+            if prediction == 'R':
+                image.image_series = image_series_right
+            if prediction == 'N':
+                image.image_series = image_series_unknown
+
+            image.order = None
+            image.save()
+
+        return redirect('gui:examination-detail', pk=examination.id)
+
+
+class ImageChangeLeft(LoginRequiredMixin, View):
+    login_url = 'gui:login'
+
+    def get(self, request, pk, id):
+        examination = models.Examination.objects.filter(id=pk)[0]
+        image = models.Image.objects.filter(id=id)[0]
+        image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
+
+        if len(image_series_left) == 0:
+            image_series_left = models.ImageSeries.objects.create(eye='L', examination=examination)
+        else:
+            image_series_left = image_series_left[0]
+
+        image.order = None
+        image.image_series = image_series_left
+        image.save()
+
+        return redirect('gui:examination-detail', pk=examination.id)
+
+
+class ImageChangeRight(LoginRequiredMixin, View):
+    login_url = 'gui:login'
+
+    def get(self, request, pk, id):
+        examination = models.Examination.objects.filter(id=pk)[0]
+        image = models.Image.objects.filter(id=id)[0]
+        image_series_right = models.ImageSeries.objects.filter(
+            eye='R', examination=examination)
+
+        if len(image_series_right) == 0:
+            image_series_right = models.ImageSeries.objects.create(
+                eye='R', examination=examination)
+        else:
+            image_series_right = image_series_right[0]
+
+        image.order = None
+        image.image_series = image_series_right
+        image.save()
+
+        return redirect('gui:examination-detail', pk=examination.id)
+
+
+class SequenceDetectionNet(LoginRequiredMixin, View):
+    login_url = 'gui:login'
+
+    def get(self, request, pk):
+        query = SequenceDetectionQuery()
+        examination = models.Examination.objects.filter(id=pk)[0]
+
+        image_series_right = models.ImageSeries.objects.filter(eye='R', examination=examination)
+        images_right = models.Image.objects.filter(image_series=image_series_right)
+        images = [image.image for image in images_right]
+        result, differences = query.predict(images)
+        result_keys = result.keys()
+        for image in images_right:
+            pos = list(result_keys).index(image.image.name)
+            image.order = pos + 1
+            image.save()
+
+        request.session['result_right'] = result
+        request.session['differences_right'] = differences
+
+        image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
+        images_left = models.Image.objects.filter(image_series=image_series_left)
+        images = [image.image for image in images_left]
+        result, differences = query.predict(images)
+        result_keys = result.keys()
+        for image in images_left:
+            pos = list(result_keys).index(image.image.name)
+            image.order = pos + 1
+            image.save()
+
+        request.session['result_left'] = result
+        request.session['differences_left'] = differences
+
+        return redirect('gui:examination-detail', pk=examination.id)
