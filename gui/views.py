@@ -10,9 +10,8 @@ from PIL import Image
 from django_filters.views import FilterView
 from django_filters import rest_framework as filters
 
-from . import forms, models
-from data_module import models as dataModels
-
+from . import forms
+from data_module import models
 
 class IndexView(LoginRequiredMixin, View):
     template_name = 'home.html'
@@ -47,14 +46,14 @@ class IndexView(LoginRequiredMixin, View):
 
 
 class PatientList(LoginRequiredMixin, FilterView):
-    model = models.Patient
+    model = models.Person
     template_name = 'patient_list.html'
     login_url = 'gui:login'
     filter_fields = ('first_name', 'last_name')
 
 
 class PatientAdd(LoginRequiredMixin, CreateView):
-    model = models.Patient
+    model = models.Person
     form_class = forms.PatientForm
     template_name = 'patient_form.html'
     success_url = '/patients'
@@ -62,7 +61,7 @@ class PatientAdd(LoginRequiredMixin, CreateView):
 
 
 class PatientUpdate(LoginRequiredMixin, UpdateView):
-    model = models.Patient
+    model = models.Person
     form_class = forms.PatientForm
     template_name = 'patient_form.html'
     success_url = '/patients'
@@ -70,7 +69,7 @@ class PatientUpdate(LoginRequiredMixin, UpdateView):
 
 
 class PatientDelete(LoginRequiredMixin, DeleteView):
-    model = models.Patient
+    model = models.Person
     template_name = 'patient_confirm_delete.html'
     success_url = '/patients'  
     login_url = 'gui:login'
@@ -81,12 +80,10 @@ class ExaminationList(LoginRequiredMixin, ListView):
     login_url = 'gui:login'
     
     def get_queryset(self):
-        queryset = dataModels.Examination.objects.all()
+        queryset = models.Examination.objects.all()
 
         for examination in queryset:
-            examination.patient = examination.person.patient
-            
-            description = dataModels.Description.objects.filter(examination=examination)
+            description = models.Description.objects.filter(examination=examination)
             if len(description) > 0:
                 examination.description = description[0]
             else:
@@ -96,25 +93,24 @@ class ExaminationList(LoginRequiredMixin, ListView):
 
 
 class ExaminationAdd(LoginRequiredMixin, FormView):
-    model = dataModels.Examination
+    model = models.Examination
     form_class = forms.ExaminationCombinedForm
     template_name = 'examination_form.html'
     success_url = '/examinations'
 
     def form_valid(self, form):
-        person = dataModels.Person.objects.create(patient=form.cleaned_data['patient'])
-        examination = dataModels.Examination.objects.create(
-            person=person,
+        examination = models.Examination.objects.create(
+            person=form.cleaned_data['person'],
             date=form.cleaned_data['date']
         )
-        dataModels.Description.objects.create(
+        models.Description.objects.create(
             text=form.cleaned_data['text'],
             examination=examination
         )
-
+        image_series = models.ImageSeries.objects.create(name='unknown', examination=examination)
         images = form.cleaned_data['attachments']
         for image in images:
-            imageObject = dataModels.Image.objects.create(name = image.name, examination=examination)
+            imageObject = models.Image.objects.create(name=image.name, image_series=image_series)
             imageObject.image.save(image.name, image)
 
         return super(ExaminationAdd, self).form_valid(form)
@@ -122,7 +118,7 @@ class ExaminationAdd(LoginRequiredMixin, FormView):
 
 class ExaminationUpdate(LoginRequiredMixin, FormView):
     # TODO
-    model = dataModels.Examination
+    model = models.Examination
     form_class = forms.ExaminationCombinedForm
     template_name = 'examination_form.html'
     success_url = '/examinations'
@@ -130,7 +126,7 @@ class ExaminationUpdate(LoginRequiredMixin, FormView):
 
 
 class ExaminationDelete(LoginRequiredMixin, DeleteView):
-    model = dataModels.Examination
+    model = models.Examination
     template_name = 'examination_confirm_delete.html'
     success_url = '/examinations'
     login_url = 'gui:login'
@@ -141,9 +137,11 @@ class ExaminationDetail(LoginRequiredMixin, View):
     login_url = 'gui:login'
 
     def get(self, request, pk):
-        examination = dataModels.Examination.objects.filter(id=pk)[0]
-        description = dataModels.Description.objects.filter(examination=examination)[0]
-        images = dataModels.Image.objects.filter(examination=examination)
+        examination = models.Examination.objects.filter(id=pk)[0]
+        description = models.Description.objects.filter(examination=examination)[0]
+
+        image_series = models.ImageSeries.objects.filter(examination=examination)
+        images = models.Image.objects.filter(image_series=image_series)
 
         return render(request, self.template_name, {
             'examination': examination,

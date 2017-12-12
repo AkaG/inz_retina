@@ -14,6 +14,9 @@
 
             {% for image in images %}
                 <img src="{{image.image.url}}" alt="" class="img-thumbnail" height="300">
+                Eye: {{image.image_series.eye}}
+                <button class="btn btn-outline-info">Change to LEFT</button>
+                <button class="btn btn-outline-info">Change to RIGHT</button>
             {% endfor %}
         </p>
     </div>

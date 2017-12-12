@@ -3,13 +3,12 @@ from __future__ import unicode_literals
 from django import forms
 from multiupload.fields import MultiMediaField
 
-from gui import models
 from data_module.models import Examination, Description, Person
 
 
 class PatientForm(forms.ModelForm):
     class Meta:
-        model = models.Patient
+        model = Person
         fields = [
             'first_name',
             'last_name',
@@ -25,18 +24,11 @@ class PatientForm(forms.ModelForm):
         }
 
 
-class PersonForm(forms.ModelForm):
-    class Meta:
-        model = Person
-        fields = [
-            'patient'
-        ]
-
-
 class ExaminationForm(forms.ModelForm):
     class Meta:
         model = Examination
         fields = [
+            'person',
             'date'
         ]
 
@@ -102,4 +94,4 @@ class CombinedFormBase(forms.Form):
 
 
 class ExaminationCombinedForm(CombinedFormBase):
-    form_classes = [PersonForm, ExaminationForm, DescriptionForm, UploadForm]
+    form_classes = [ExaminationForm, DescriptionForm, UploadForm]
