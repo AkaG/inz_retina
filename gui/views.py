@@ -75,9 +75,11 @@ class PatientDelete(LoginRequiredMixin, DeleteView):
     login_url = 'gui:login'
 
 
-class ExaminationList(LoginRequiredMixin, ListView):
+class ExaminationList(LoginRequiredMixin, FilterView):
+    model = models.Examination
     template_name = 'examination_list.html'
     login_url = 'gui:login'
+    filter_fields = ('person',)
     
     def get_queryset(self):
         queryset = models.Examination.objects.all()
