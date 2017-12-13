@@ -14,6 +14,7 @@
                 <th>Code</th>
                 <th>Birth Date</th>
                 <th>Sex</th>
+                <th>Owner</th>
                 <th class="text-center">Actions</th>
             </tr>
         </thead>
@@ -27,7 +28,9 @@
                 <td>{{ patient.code_name }}</td>
                 <td>{{ patient.birth_date }}</td>
                 <td>{{ patient.sex }}</td>
+                <td>{{ patient.owner }}</td>
                 <td class="text-center">
+                    {% if user == patient.owner %}
                     <div class="btn-group btn-group-sm">
                         <a href="{% url 'gui:patient-update' patient.id %}" class="btn btn-warning">
                             <i class="fa fa-pencil"></i>
@@ -36,6 +39,7 @@
                             <i class="fa fa-trash"></i>
                         </a>
                     </div>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}

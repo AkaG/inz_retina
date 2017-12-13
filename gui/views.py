@@ -13,6 +13,7 @@ from django_filters import rest_framework as filters
 
 from . import forms
 from data_module import models
+from django.contrib.auth.models import User
 
 class IndexView(LoginRequiredMixin, View):
     template_name = 'home.html'
@@ -50,7 +51,7 @@ class PatientList(LoginRequiredMixin, FilterView):
     model = models.Person
     template_name = 'patient_list.html'
     login_url = 'gui:login'
-    filter_fields = ('first_name', 'last_name')
+    filter_fields = ('first_name', 'last_name', 'owner')
 
 
 class PatientAdd(LoginRequiredMixin, CreateView):
@@ -59,6 +60,10 @@ class PatientAdd(LoginRequiredMixin, CreateView):
     template_name = 'patient_form.html'
     success_url = '/patients'
     login_url = 'gui:login'
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super(PatientAdd, self).form_valid(form)
 
 
 class PatientUpdate(LoginRequiredMixin, UpdateView):

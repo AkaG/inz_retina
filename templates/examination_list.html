@@ -24,11 +24,13 @@
                 <td>{{ examination.description.text }}</td>
                 <td>{{ examination.date }}</td>
                 <td class="text-center">
+                    {% if user == examination.person.owner %}
                     <div class="btn-group btn-group-sm">
                         <a href="{% url 'gui:examination-delete' examination.id %}" class="btn btn-danger">
                             <i class="fa fa-trash"></i>
                         </a>
                     </div>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}

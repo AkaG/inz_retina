@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth import models as auth_models
 
 # Create your models here.
 
@@ -10,6 +11,8 @@ class Person(models.Model):
     birth_date = models.DateField(blank=True, null=True)
     code_name = models.TextField(blank=True, null=True)
     sex = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+
+    owner = models.ForeignKey(auth_models.User, blank=True, null=True)
 
     class Meta:
         ordering = ['last_name', 'first_name']
