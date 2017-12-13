@@ -1,0 +1,8 @@
+_obrzęk = and(obrzęk, not("bez obrzęk"), not("brak cech obrzęk"), not("bez cech obrzęk"))
+_oct = or(soct, oct)
+_cnv = and(cnv, not("bez cnv"), not("brak cech obecność cnv"))
+_zwyrodnienie = or(zwyrodnienie, zwyrodnieniowy)
+_rpe = or("ubytek rpe", "zanik rpe", "mała ilość barwnik rpe")
+_wypełnienie = or("prawidłowy wypełnienie naczynia", "wypełniać naczynia siatkówka prawidłowy")
+_hiperfluorescencja = and(hiperfluorescencja, not("bez cech patologiczny fluorescencja"), not("brak cech patologiczny fluorescencja"), not("hiperfluorescencja nie"))
+_hipofluorescencja = and(hipofluorescencja, not("bez cech patologiczny fluorescencja"), not("brak cech patologiczny fluorescencja"))
