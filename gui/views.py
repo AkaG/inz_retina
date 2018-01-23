@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from integrations.left_right_eye_nn.LeftRightEyeQuery import LeftRightEyeQuery
 from integrations.sequence_detection_nn.SequenceDetectionQuery import SequenceDetectionQuery
+from integrations.diagnosis_nn.DiagnosisQuery import DiagnosisQuery
 from neural_network.nn_manager.DataGenerator import DataGenerator
 from PIL import Image
 
@@ -309,5 +310,25 @@ class SequenceDetectionNet(LoginRequiredMixin, View):
 
         request.session['result_left'] = result
         request.session['differences_left'] = differences
+
+        return redirect('gui:examination-detail', pk=examination.id)
+
+class DiagnosisNet(LoginRequiredMixin, View):
+    login_url = 'gui:login'
+
+    def get(self, request, pk):
+        query = DiagnosisQuery()
+        examination = models.Examination.objects.filter(id=pk)[0]
+
+        image_series = models.ImageSeries.objects.filter(examination=examination)
+        images_all = models.Image.objects.filter(image_series=image_series)
+        images = [Image.open(image.image) for image in images_all]
+        names = [image.name for image in images_all]
+
+        pred = query.model_predict(datagen.flow(
+            images, names), batch=len(images_all)
+        )
+
+        print(result)
 
         return redirect('gui:examination-detail', pk=examination.id)
