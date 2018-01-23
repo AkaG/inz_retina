@@ -317,18 +317,26 @@ class DiagnosisNet(LoginRequiredMixin, View):
     login_url = 'gui:login'
 
     def get(self, request, pk):
-        query = DiagnosisQuery()
+        # query = DiagnosisQuery()
         examination = models.Examination.objects.filter(id=pk)[0]
 
-        image_series = models.ImageSeries.objects.filter(examination=examination)
-        images_all = models.Image.objects.filter(image_series=image_series)
-        images = [Image.open(image.image) for image in images_all]
-        names = [image.name for image in images_all]
+        image_series_unknown = models.ImageSeries.objects.filter(name='unknown', examination=examination)
+        image_series_left = models.ImageSeries.objects.filter(eye='L', examination=examination)
+        image_series_right = models.ImageSeries.objects.filter(eye='R', examination=examination)
 
-        pred = query.model_predict(datagen.flow(
-            images, names), batch=len(images_all)
-        )
+        images_all = models.Image.objects.filter(image_series=image_series_unknown) | models.Image.objects.filter(
+            image_series=image_series_right) | models.Image.objects.filter(image_series=image_series_left)
+        images_filtered = []
 
-        print(result)
+        for image in images_all:
+            if image.order in [1, len(images_all) // 2, len(images_all)]:
+                images_filtered.append(image)
+
+        images = [Image.open(image.image) for image in images_filtered]
+        names = [image.name for image in images_filtered]
+
+        # pred = query.model_predict(datagen.flow(
+        #     images, names), batch=3
+        # )
 
         return redirect('gui:examination-detail', pk=examination.id)
