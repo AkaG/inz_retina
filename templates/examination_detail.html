@@ -11,8 +11,9 @@
             <span class="display-4">{{examination.person}}</span><br>
             Description <span class="text-info">{{description}}</span><br>
             Date <span class="text-info">{{examination.date}}</span><br>
-            <a href="{% url 'gui:examination-left-right-eye' examination.id %}"><button class="btn btn-primary mt-2">LeftRightEyeNet</button></a><br>
-            <a href="{% url 'gui:examination-sequence-detection' examination.id %}"><button class="btn btn-primary mt-2">SequenceDetectionNet</button></a><br>
+            <a href="{% url 'gui:examination-diagnosis' examination.id %}"><button class="btn btn-primary mt-2">Diagnosis</button></a><br>
+            <a href="{% url 'gui:examination-left-right-eye' examination.id %}"><button class="btn btn-primary mt-2">Left-Right Eye</button></a><br>
+            <a href="{% url 'gui:examination-sequence-detection' examination.id %}"><button class="btn btn-primary mt-2">Sequence Detection</button></a><br>
         </p>
     </div>
 </div>
