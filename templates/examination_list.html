@@ -1,0 +1,48 @@
+{% extends 'page.html' %}
+
+{% load static widget_tweaks %}
+
+{% block content %}
+<h1>Examinations</h1>
+{% include 'filter.html' %}
+<div class="table-responsive">
+    <table class="table table-light table-striped table-hover examination-list">
+        <thead class="thead-inverse">
+            <tr>
+                <th>Patient</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for examination in object_list %}
+            <tr>
+                <th scope="row">
+                    <a class="text-info" href="{% url 'gui:examination-detail' examination.id %}">{{ examination.person }}</a>
+                </th>
+                <td>{{ examination.description.text }}</td>
+                <td>{{ examination.date }}</td>
+                <td class="text-center">
+                    {% if user == examination.person.owner %}
+                    <div class="btn-group btn-group-sm">
+                        <a href="{% url 'gui:examination-delete' examination.id %}" class="btn btn-danger">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <th colspan="5">No examinations found.</th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="{% url 'gui:examination-add' %}" class="btn btn-sm btn-success">
+    Add an Examination
+</a>
+{% endblock %}

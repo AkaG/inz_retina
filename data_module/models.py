@@ -1,11 +1,24 @@
 from django.db import models
-
+from django.contrib.auth import models as auth_models
 
 # Create your models here.
 
 class Person(models.Model):
-    code_name = models.TextField()
-    sex = models.CharField(max_length=1)
+    GENDER_CHOICES = (('M', 'Male',), ('F', 'Female',))
+
+    first_name = models.CharField(max_length=255, blank=True, null=True)
+    last_name = models.CharField(max_length=255, blank=True, null=True)
+    birth_date = models.DateField(blank=True, null=True)
+    code_name = models.TextField(blank=True, null=True)
+    sex = models.CharField(max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
+
+    owner = models.ForeignKey(auth_models.User, blank=True, null=True)
+
+    class Meta:
+        ordering = ['last_name', 'first_name']
+
+    def __str__(self):
+        return '{} {}'.format(self.first_name, self.last_name)
 
 
 class Examination(models.Model):
@@ -42,7 +55,7 @@ class ImageSeries(models.Model):
         blank=True,
         null=True
     )
-    name = models.TextField()
+    name = models.TextField(blank=True, null=True)
     info = models.TextField(blank=True, null=True)
 
     examination = models.ForeignKey(Examination, on_delete=models.CASCADE)
@@ -68,5 +81,6 @@ class Image(models.Model):
     )
     height_field = models.IntegerField(default=0, null=True)
     width_field = models.IntegerField(default=0, null=True)
+    order = models.IntegerField(blank=True, null=True)
 
-    image_series = models.ForeignKey(ImageSeries, on_delete=models.CASCADE)
+    image_series = models.ForeignKey(ImageSeries, on_delete=models.CASCADE, null=True)

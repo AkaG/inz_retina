@@ -1,0 +1,15 @@
+@import "reset";
+
+@import '../../node_modules/bootstrap/scss/bootstrap';
+
+body {
+  background-color: #dde2e6;
+  padding-top: 5rem;
+}
+
+@media screen and (min-width: 992px) {
+  .patient-detail-column {
+    width: 100%;
+    position: fixed;
+  }
+}
